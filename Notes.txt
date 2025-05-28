@@ -8,26 +8,26 @@
  Funktionsblöcke (Module/Features)
 
 📦 Core Habit Tracking
-    •    Habit anlegen, bearbeiten, löschen
-    •    Verknüpfter Timer
-    •    Daily Check mit Screenshot-Pflicht
-    •    XP-Berechnung basierend auf Tags
+    •    Habit anlegen, bearbeiten, löschen (✅)
+    •    Verknüpfter Timer (✅)
+    •    Daily Check mit Screenshot-Pflicht (✅)
     •    Streak-Tracking
+    •    Kategorien mit den Habits verbiden und als variablen setzten
+    
 
 📘 Logbuch-System
     •    Tagebuch-Einträge zu jedem Habit
     •    Bild-/Notiz-Upload pro Tag
 
 📊 XP & Parameter-System
-    •    XP-Tags (z.B. #Sport, #Fokus)
-    •    Automatische Verteilung auf mentale/körperliche Parameter
-    •    Fortschrittsbalken je Parameter (dynamisch)
+- AI
 
 🪙 Belohnungs-/Bestrafungssystem
     •    Level-Up = Coins verdienen
     •    Coins gegen Wünsche eintauschen
     •    Belohnungen: Serien, Games, Essen, etc.
     •    Strafen: doppelte Aufgabe, Coinverlust, XP-Reset, Wunschlöschung
+    -- AI
 
 🎯 Wunschverwaltung (KI-gesteuert)
     •    Wunschliste + “Verschoben”-Liste
