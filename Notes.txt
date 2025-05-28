@@ -1,0 +1,42 @@
+=== IDEAS ===
+Bevor man auf die Checkmark klickt, muss man ein Screenshot von dem erbegniss senden (✅)
+---
+So ich muss noch im Habbit Tracker so ein Tagesbuch erstellen um so ein Log Buch zu führen.
+---
+Noch in die Habbit Tracker App mus man die Funktion hinzufügen das: man auch azeigt welche Belohnung man nehmen kann z.B sich einen abziehen
+---
+man könnte noch die Verschiebe liste auch in der App itegrierena (Music, Filme/Serien/Animes)
+---
+[25.05.25, 16:56:13] Daniel: Ich würde dann das auch in die App integrieren als Motivation. Oder als belonung wenn du z.B zum 10 lvl. kommst. (Also das du dann die erlaubnisss beekommst eine weitere folge als beispiel zu gucken)
+[25.05.25, 16:59:42] Daniel: und noch würde ich dann auch so eine Wunsch liste auch in die App integrieren (Wir werden immer etwas darein schreiben also unsere wünsche (Das Anime zu gucken, in McDonalds zu gehen, irgend eine Sache zu kaufen wie ein Game oder so) Oder was auch immer wir machen möchten) - Das wird alles dann verschoben zu dem Zeitpunkt wo wir es sogesagt verdinen. (Dann wird auch die KI unsere Wünsche Analysieren und je nach Priorität dann so die beelohnungen einteilen.)
+---
+Yo, hab noch ein Antriebs Idee, aber die ist so bisschen Hardcore, und zwar wenn du ja ein Geiles Animes gefunden hast, oder eines wird raus kommen und du hast schon so die ersten paar serien geschaut. Dann hast du so wie eine art sucht das du willst es gucken. - Und das kann man ausnutzten. Es ist so ähnlich als wir klein waren z.B: Bevor wir das Leckere essen essen, müssen wir das unleckere essen. (Wir essen ja das unleckere essen (alsob es unkomfortabel ist und wir wollen es nicht, tuen wir es trotzdem um das Leckere später zu essen)) - Das selbe kann man machen indem wir so z.B bevor wir das Geile Anime/Music/Ereigniss/Einkauf machen, müssen wir zuerst reich werden.
+---
+Noch YT videos immer als Später schauen markieren und dann das in die App rein schireben
+---
+Noch wenn man ein Level bekommnt man coins für die man sein Wunsch einlösen kann. Crypto Tokens
+---
+
+Und noch ein bestraf system.
+Vlt. etwas in der Art das du am nächsten tag statt: 100 Push Ups 200 machen musst, oder so. Oder das einer deine Wünsche sich löscht oder der level sich erhöcht bzw. mehr coins kostet wird
+---
+Als schtrafe könnte noch so etwas passen vlt.: Einfach zum lvl. 0 kommen und 0 xp anfangen. - So ein full reset
+---
+Kannst du auch einstellen das man direkt ein foto machen kann?
+---
+Timer zu Habit verknüpfen als das.
+---
+Daysstreaks
+---
+habit eigenschaften: Katekorieren ?: Gesundheit, Sport, Inteligence, Sprachen, Ausdauer,
+=== BUGS ===
+Keine Animation (Wurde jetzt gefixt (groq chat))
+
+
+
+
+
+
+=== TODOS ===
+- Die unteren Srarischen Progress Bars dynamisch machen.
+-
