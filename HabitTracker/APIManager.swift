@@ -8,6 +8,7 @@ struct APIHabit: Codable, Identifiable {
     let isCompleted: Bool
     let progress: Double
     let isRecurring: Bool
+    let deadlineDuration: Int?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -17,6 +18,7 @@ struct APIHabit: Codable, Identifiable {
         case isCompleted
         case progress
         case isRecurring
+        case deadlineDuration = "deadline_duration"
     }
 }
 
@@ -27,6 +29,7 @@ struct APIHabitCreate: Codable {
     let isCompleted: Bool
     let progress: Double
     let isRecurring: Bool
+    let deadlineDuration: Int?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -35,6 +38,7 @@ struct APIHabitCreate: Codable {
         case isCompleted
         case progress
         case isRecurring
+        case deadlineDuration = "deadline_duration"
     }
 }
 
@@ -54,7 +58,7 @@ enum APIError: Error, LocalizedError {
         case .decodingError(let error):
             return "Dekodierungsfehler: \(error.localizedDescription)"
         case .serverError(let message):
-            return "Serverfehler: \(message)"
+            return "Serverfehler: \(message)" // Korrektur: 'return' hinzugefügt
         case .unauthorized:
             return "Nicht autorisiert"
         }

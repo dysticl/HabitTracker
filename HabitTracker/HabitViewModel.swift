@@ -1,6 +1,5 @@
 import Foundation
 import SwiftUI
-import Combine
 
 struct Habit: Identifiable, Codable, Equatable {
     let id: UUID
@@ -10,10 +9,23 @@ struct Habit: Identifiable, Codable, Equatable {
     var isCompleted: Bool
     var progress: Double
     var isRecurring: Bool
+    var deadlineDuration: Int? // Neue Eigenschaft für Deadline in Sekunden
     var pendingDeletion: Bool
     
     static func ==(lhs: Habit, rhs: Habit) -> Bool {
         return lhs.id == rhs.id
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case emoji
+        case xpPoints = "xp_points"
+        case isCompleted
+        case progress
+        case isRecurring
+        case deadlineDuration = "deadline_duration"
+        case pendingDeletion
     }
 }
 
@@ -22,16 +34,9 @@ class HabitViewModel: ObservableObject {
     @Published var isAdding: Bool = false
     @Published var newHabitName: String = ""
     @Published var newHabitEmoji: String = ""
+    @Published var newHabitDeadlineHours: String = "" // Neue Eigenschaft für UI-Eingabe (Stunden)
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-    
-    private var cancellables = Set<AnyCancellable>()
-    
-    init() {
-        Task {
-            await fetchHabits()
-        }
-    }
     
     func fetchHabits() async {
         await MainActor.run {
@@ -57,6 +62,7 @@ class HabitViewModel: ObservableObject {
                         isCompleted: apiHabit.isCompleted,
                         progress: apiHabit.progress,
                         isRecurring: apiHabit.isRecurring,
+                        deadlineDuration: apiHabit.deadlineDuration,
                         pendingDeletion: false
                     )
                 }
@@ -102,6 +108,7 @@ class HabitViewModel: ObservableObject {
                                 isCompleted: updatedHabit.isCompleted,
                                 progress: updatedHabit.progress,
                                 isRecurring: updatedHabit.isRecurring,
+                                deadlineDuration: updatedHabit.deadlineDuration,
                                 pendingDeletion: false
                             )
                         }
@@ -147,7 +154,8 @@ class HabitViewModel: ObservableObject {
                 xpPoints: habit.xpPoints,
                 isCompleted: habits[index].isCompleted,
                 progress: habit.progress,
-                isRecurring: habit.isRecurring
+                isRecurring: habit.isRecurring,
+                deadlineDuration: habit.deadlineDuration
             )
             let updatedHabit = try await APIManager.shared.updateHabit(apiHabit)
             
@@ -167,6 +175,7 @@ class HabitViewModel: ObservableObject {
                             isCompleted: updatedHabit.isCompleted,
                             progress: updatedHabit.progress,
                             isRecurring: updatedHabit.isRecurring,
+                            deadlineDuration: updatedHabit.deadlineDuration,
                             pendingDeletion: false
                         )
                     }
@@ -222,13 +231,23 @@ class HabitViewModel: ObservableObject {
         
         let defaultEmojis = ["⭐️", "🔥", "💪", "📘", "☀️", "🧠", "📈", "🏆"]
         let selectedEmoji = newHabitEmoji.isEmpty ? defaultEmojis.randomElement() ?? "⭐️" : newHabitEmoji
+        
+        // Deadline-Dauer aus Stunden in Sekunden umrechnen
+        let deadlineDuration: Int?
+        if let hours = Int(newHabitDeadlineHours), hours > 0 {
+            deadlineDuration = hours * 3600 // Stunden in Sekunden
+        } else {
+            deadlineDuration = nil
+        }
+        
         let newHabit = APIHabitCreate(
             name: newHabitName,
             emoji: selectedEmoji,
             xpPoints: 10,
             isCompleted: false,
             progress: 0.0,
-            isRecurring: false
+            isRecurring: false,
+            deadlineDuration: deadlineDuration
         )
         
         Task {
@@ -266,10 +285,12 @@ class HabitViewModel: ObservableObject {
                             isCompleted: apiHabit.isCompleted,
                             progress: apiHabit.progress,
                             isRecurring: apiHabit.isRecurring,
+                            deadlineDuration: apiHabit.deadlineDuration,
                             pendingDeletion: false
                         ))
                         self.newHabitName = ""
                         self.newHabitEmoji = ""
+                        self.newHabitDeadlineHours = ""
                         self.isAdding = false
                         self.isLoading = false
                     }

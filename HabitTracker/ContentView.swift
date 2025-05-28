@@ -4,9 +4,9 @@ import PhotosUI
 
 // Statische Habits für das rechte Diagramm
 let staticHabits: [Habit] = [
-    Habit(id: UUID(), name: "Gym", emoji: "💪", xpPoints: 15, isCompleted: false, progress: 0.6, isRecurring: false, pendingDeletion: false),
-    Habit(id: UUID(), name: "Lernen", emoji: "🧠", xpPoints: 10, isCompleted: false, progress: 0.3, isRecurring: false, pendingDeletion: false),
-    Habit(id: UUID(), name: "Ernährung", emoji: "🍏", xpPoints: 20, isCompleted: false, progress: 0.8, isRecurring: false, pendingDeletion: false)
+    Habit(id: UUID(), name: "Gym", emoji: "💪", xpPoints: 15, isCompleted: false, progress: 0.6, isRecurring: false, deadlineDuration: nil, pendingDeletion: false),
+    Habit(id: UUID(), name: "Lernen", emoji: "🧠", xpPoints: 10, isCompleted: false, progress: 0.3, isRecurring: false, deadlineDuration: nil, pendingDeletion: false),
+    Habit(id: UUID(), name: "Ernährung", emoji: "🍏", xpPoints: 20, isCompleted: false, progress: 0.8, isRecurring: false, deadlineDuration: nil, pendingDeletion: false)
 ]
 
 struct ContentView: View {
@@ -134,11 +134,22 @@ struct ContentView: View {
                             }
                             
                             if viewModel.isAdding {
-                                HStack {
+                                VStack(spacing: 8) {
                                     TextField("Habit Name", text: $viewModel.newHabitName)
                                         .textFieldStyle(PlainTextFieldStyle())
                                         .foregroundColor(.white)
                                         .padding(.horizontal)
+                                    
+                                    TextField("Emoji (optional)", text: $viewModel.newHabitEmoji)
+                                        .textFieldStyle(PlainTextFieldStyle())
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal)
+                                    
+                                    TextField("Deadline (Stunden, optional)", text: $viewModel.newHabitDeadlineHours)
+                                        .textFieldStyle(PlainTextFieldStyle())
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal)
+                                        .keyboardType(.numberPad)
                                     
                                     Button(action: {
                                         viewModel.addHabit()
@@ -263,10 +274,20 @@ struct ContentView: View {
                 .padding(.bottom, 16)
             }
             .ignoresSafeArea(edges: .bottom)
-        }
-        .onAppear {
-            Task {
-                await viewModel.fetchHabits()
+            .onAppear {
+                Task {
+                    await viewModel.fetchHabits()
+                }
+            }
+            .alert(isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { if !$0 { viewModel.errorMessage = nil } }
+            )) {
+                Alert(
+                    title: Text("Fehler"),
+                    message: Text(viewModel.errorMessage ?? "Unbekannter Fehler"),
+                    dismissButton: .default(Text("OK"))
+                )
             }
         }
     }
@@ -287,6 +308,13 @@ struct HabitRow: View {
                 .fontWeight(.medium)
             
             Spacer()
+            
+            // TODO: Später Timer für habit.deadlineDuration hinzufügen
+            // if let duration = habit.deadlineDuration {
+            //     Text(formatDuration(duration))
+            //         .foregroundColor(.gray)
+            //         .font(.system(size: 14))
+            // }
             
             Image(systemName: "repeat")
                 .foregroundColor(habit.isRecurring ? .blue : .gray)
