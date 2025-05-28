@@ -37,7 +37,7 @@ API-Schlüssel: Ein gültiger API-Schlüssel für die Backend-Kommunikation.
 Installation
 1. iOS-App
 
-Repository klonen:git clone [[https://github.com/dein-benutzername/habit-tracker.git](https://github.com/dysticl/HabitTracker.git)](https://github.com/dysticl/HabitTracker.git)
+Repository klonen:git clone [(https://github.com/dysticl/HabitTracker.git)](https://github.com/dysticl/HabitTracker.git)
 cd habit-tracker
 
 
