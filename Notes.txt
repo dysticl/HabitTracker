@@ -29,6 +29,81 @@ Timer zu Habit verknüpfen als das.
 Daysstreaks
 ---
 habit eigenschaften: Katekorieren ?: Gesundheit, Sport, Inteligence, Sprachen, Ausdauer,
+
+---
+Idee:
+Mentale/Geistige Parameter
+    1.    Fokus / Konzentration
+    •    durch Habits wie: „Pomodoro-Sessions“, „Ablenkungsfreie Zeit“, „Meditation“, „Deep Work“
+    2.    Kreativität
+    •    durch: „Brainstorming“, „Tagebuch schreiben“, „Kunst“, „Musik machen“, „Designübungen“
+    3.    Lernen / Bildung
+    •    durch: „Buch lesen“, „Online-Kurse“, „Vokabeln lernen“, „Schul-/Uni-Tasks“
+
+⸻
+
+💪 Körperliche Parameter
+    4.    Ausdauer
+    •    durch: „Joggen“, „Radfahren“, „Cardio-Einheiten“, „Schwimmen“
+    5.    Beweglichkeit
+    •    durch: „Stretching“, „Yoga“, „Mobility-Training“
+    6.    Ernährung
+    •    durch: „Gesund gekocht“, „Keine Süßigkeiten“, „Wasser getrunken“
+
+⸻
+
+💬 Soziale/Emotionale Parameter
+    7.    Charisma / Soziale Skills
+    •    durch: „Smalltalk gemacht“, „Netzwerktreffen“, „Feedbackgespräch geführt“, „Präsentation gehalten“
+    8.    Emotionale Stabilität / Mindfulness
+    •    durch: „Tagebuch geführt“, „Achtsamkeit geübt“, „Schlaf getrackt“
+
+⸻
+
+💼 Produktivität & Selbstorganisation
+    9.    Disziplin
+    •    durch: „Früh aufgestanden“, „To-Do-Liste abgearbeitet“, „Social Media vermieden“
+    10.    Organisation
+    •    durch: „Kalender gepflegt“, „Zimmer aufgeräumt“, „Planung für die Woche gemacht“
+
+⸻
+
+🧭 Werte- & Sinnorientierte Parameter
+    11.    Selbstentwicklung / Persönlichkeitswachstum
+    •    durch: „Reflexion“, „Bücher zur Persönlichkeitsentwicklung“, „Mentoring“
+    12.    Vision / Zielklarheit
+    •    durch: „Ziele formuliert“, „Visionboard gepflegt“, „Zukunftsplanung gemacht“
+
+⸻
+
+💰 Beruf / Business / Finanzen
+    13.    Finanzielle Intelligenz
+    •    durch: „Investiert“, „Finanzbuch geführt“, „Finanzkurs absolviert“
+    14.    Business-Skills
+    •    durch: „Produkt optimiert“, „Verkaufsgespräch geübt“, „Marketingstrategie überarbeitet“
+
+⸻
+
+🛠️ Technische / Fachliche Skills
+    15.    Technologie / Coding
+    •    durch: „Coding-Übung gemacht“, „Neues Tool gelernt“, „Automatisierung aufgebaut“
+    16.    Fachkompetenz
+    •    durch: „Spezifische Aufgaben in deinem Bereich erledigt“ (z.B. „Mathematik geübt“, „BWL-Thema gelernt“)
+
+⸻
+
+Umsetzungstipp:
+
+Du kannst den einzelnen Habits sogenannte “XP-Tags” geben, also Kategorien wie #Sport, #Lernen, #Sozial, #Disziplin. Die KI erkennt dann, welchem Parameter die XP zugeordnet werden müssen.
+
+Beispiel:
+    •    Habit: “30 Minuten Gym”
+    •    XP: +10
+    •    Tags: #Sport, #Ausdauer, #Stärke
+    •    → Parameter “Stärke/Sport” +6 XP, “Ausdauer” +4 XP
+
+⸻
+
 === BUGS ===
 Keine Animation (Wurde jetzt gefixt (groq chat))
 
