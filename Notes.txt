@@ -1,117 +1,78 @@
-=== IDEAS ===
-Bevor man auf die Checkmark klickt, muss man ein Screenshot von dem erbegniss senden (✅)
----
-So ich muss noch im Habbit Tracker so ein Tagesbuch erstellen um so ein Log Buch zu führen.
----
-Noch in die Habbit Tracker App mus man die Funktion hinzufügen das: man auch azeigt welche Belohnung man nehmen kann z.B sich einen abziehen
----
-man könnte noch die Verschiebe liste auch in der App itegrierena (Music, Filme/Serien/Animes)
----
-[25.05.25, 16:56:13] Daniel: Ich würde dann das auch in die App integrieren als Motivation. Oder als belonung wenn du z.B zum 10 lvl. kommst. (Also das du dann die erlaubnisss beekommst eine weitere folge als beispiel zu gucken)
-[25.05.25, 16:59:42] Daniel: und noch würde ich dann auch so eine Wunsch liste auch in die App integrieren (Wir werden immer etwas darein schreiben also unsere wünsche (Das Anime zu gucken, in McDonalds zu gehen, irgend eine Sache zu kaufen wie ein Game oder so) Oder was auch immer wir machen möchten) - Das wird alles dann verschoben zu dem Zeitpunkt wo wir es sogesagt verdinen. (Dann wird auch die KI unsere Wünsche Analysieren und je nach Priorität dann so die beelohnungen einteilen.)
----
-Yo, hab noch ein Antriebs Idee, aber die ist so bisschen Hardcore, und zwar wenn du ja ein Geiles Animes gefunden hast, oder eines wird raus kommen und du hast schon so die ersten paar serien geschaut. Dann hast du so wie eine art sucht das du willst es gucken. - Und das kann man ausnutzten. Es ist so ähnlich als wir klein waren z.B: Bevor wir das Leckere essen essen, müssen wir das unleckere essen. (Wir essen ja das unleckere essen (alsob es unkomfortabel ist und wir wollen es nicht, tuen wir es trotzdem um das Leckere später zu essen)) - Das selbe kann man machen indem wir so z.B bevor wir das Geile Anime/Music/Ereigniss/Einkauf machen, müssen wir zuerst reich werden.
----
-Noch YT videos immer als Später schauen markieren und dann das in die App rein schireben
----
-Noch wenn man ein Level bekommnt man coins für die man sein Wunsch einlösen kann. Crypto Tokens
----
+ Ideen:
+ ---
+ 
+ 
+ 
+ ---
+ 
+ Funktionsblöcke (Module/Features)
 
-Und noch ein bestraf system.
-Vlt. etwas in der Art das du am nächsten tag statt: 100 Push Ups 200 machen musst, oder so. Oder das einer deine Wünsche sich löscht oder der level sich erhöcht bzw. mehr coins kostet wird
----
-Als schtrafe könnte noch so etwas passen vlt.: Einfach zum lvl. 0 kommen und 0 xp anfangen. - So ein full reset
----
-Kannst du auch einstellen das man direkt ein foto machen kann?
----
-Timer zu Habit verknüpfen als das.
----
-Daysstreaks
----
-habit eigenschaften: Katekorieren ?: Gesundheit, Sport, Inteligence, Sprachen, Ausdauer,
+📦 Core Habit Tracking
+    •    Habit anlegen, bearbeiten, löschen
+    •    Verknüpfter Timer
+    •    Daily Check mit Screenshot-Pflicht
+    •    XP-Berechnung basierend auf Tags
+    •    Streak-Tracking
 
----
-Idee:
-Mentale/Geistige Parameter
-    1.    Fokus / Konzentration
-    •    durch Habits wie: „Pomodoro-Sessions“, „Ablenkungsfreie Zeit“, „Meditation“, „Deep Work“
-    2.    Kreativität
-    •    durch: „Brainstorming“, „Tagebuch schreiben“, „Kunst“, „Musik machen“, „Designübungen“
-    3.    Lernen / Bildung
-    •    durch: „Buch lesen“, „Online-Kurse“, „Vokabeln lernen“, „Schul-/Uni-Tasks“
+📘 Logbuch-System
+    •    Tagebuch-Einträge zu jedem Habit
+    •    Bild-/Notiz-Upload pro Tag
 
-⸻
+📊 XP & Parameter-System
+    •    XP-Tags (z.B. #Sport, #Fokus)
+    •    Automatische Verteilung auf mentale/körperliche Parameter
+    •    Fortschrittsbalken je Parameter (dynamisch)
 
-💪 Körperliche Parameter
-    4.    Ausdauer
-    •    durch: „Joggen“, „Radfahren“, „Cardio-Einheiten“, „Schwimmen“
-    5.    Beweglichkeit
-    •    durch: „Stretching“, „Yoga“, „Mobility-Training“
-    6.    Ernährung
-    •    durch: „Gesund gekocht“, „Keine Süßigkeiten“, „Wasser getrunken“
+🪙 Belohnungs-/Bestrafungssystem
+    •    Level-Up = Coins verdienen
+    •    Coins gegen Wünsche eintauschen
+    •    Belohnungen: Serien, Games, Essen, etc.
+    •    Strafen: doppelte Aufgabe, Coinverlust, XP-Reset, Wunschlöschung
+
+🎯 Wunschverwaltung (KI-gesteuert)
+    •    Wunschliste + “Verschoben”-Liste
+    •    KI priorisiert Wünsche nach Verhalten
+    •    Zuteilung abhängig von Level, Coinstand, Verhalten
+
+🎥 Medienintegration
+    •    YouTube-Liste (“Später ansehen”)
+    •    Anime-/Serien-Wunschliste
+    •    Belohnung: Medien anschauen bei Zielerreichung
 
 ⸻
 
-💬 Soziale/Emotionale Parameter
-    7.    Charisma / Soziale Skills
-    •    durch: „Smalltalk gemacht“, „Netzwerktreffen“, „Feedbackgespräch geführt“, „Präsentation gehalten“
-    8.    Emotionale Stabilität / Mindfulness
-    •    durch: „Tagebuch geführt“, „Achtsamkeit geübt“, „Schlaf getrackt“
+3. Gamification-Elemente
+    •    Levelsystem mit XP und Coins
+    •    Tages-Streaks
+    •    Progress Bars für mentale & körperliche Kategorien
+    •    Reset-Strafen bei Disziplinverlust
+    •    Freischaltbare Rewards (nach Level)
 
 ⸻
 
-💼 Produktivität & Selbstorganisation
-    9.    Disziplin
-    •    durch: „Früh aufgestanden“, „To-Do-Liste abgearbeitet“, „Social Media vermieden“
-    10.    Organisation
-    •    durch: „Kalender gepflegt“, „Zimmer aufgeräumt“, „Planung für die Woche gemacht“
+4. Psychologisches Design (Manipulation durch Belohnungsaufschub)
+
+“Bevor du ‘Demon Slayer’ guckst, machst du 3 Pomodoro-Sessions.”
+Diese Logik ist zentral. Du nutzt Süchte als Antrieb. Implementiert durch:
+
+    •    Wunsch-Freigabe an Level/Ziel gebunden
+    •    Harte Regeln im System: kein Fortschritt = kein Reward
 
 ⸻
 
-🧭 Werte- & Sinnorientierte Parameter
-    11.    Selbstentwicklung / Persönlichkeitswachstum
-    •    durch: „Reflexion“, „Bücher zur Persönlichkeitsentwicklung“, „Mentoring“
-    12.    Vision / Zielklarheit
-    •    durch: „Ziele formuliert“, „Visionboard gepflegt“, „Zukunftsplanung gemacht“
-
-⸻
-
-💰 Beruf / Business / Finanzen
-    13.    Finanzielle Intelligenz
-    •    durch: „Investiert“, „Finanzbuch geführt“, „Finanzkurs absolviert“
-    14.    Business-Skills
-    •    durch: „Produkt optimiert“, „Verkaufsgespräch geübt“, „Marketingstrategie überarbeitet“
-
-⸻
-
-🛠️ Technische / Fachliche Skills
-    15.    Technologie / Coding
-    •    durch: „Coding-Übung gemacht“, „Neues Tool gelernt“, „Automatisierung aufgebaut“
-    16.    Fachkompetenz
-    •    durch: „Spezifische Aufgaben in deinem Bereich erledigt“ (z.B. „Mathematik geübt“, „BWL-Thema gelernt“)
-
-⸻
-
-Umsetzungstipp:
-
-Du kannst den einzelnen Habits sogenannte “XP-Tags” geben, also Kategorien wie #Sport, #Lernen, #Sozial, #Disziplin. Die KI erkennt dann, welchem Parameter die XP zugeordnet werden müssen.
-
-Beispiel:
-    •    Habit: “30 Minuten Gym”
-    •    XP: +10
-    •    Tags: #Sport, #Ausdauer, #Stärke
-    •    → Parameter “Stärke/Sport” +6 XP, “Ausdauer” +4 XP
-
-⸻
-
-=== BUGS ===
-Keine Animation (Wurde jetzt gefixt (groq chat))
-
-
-
-
-
-
-=== TODOS ===
-- Die unteren Srarischen Progress Bars dynamisch machen.
--
+5. Zukünftige Erweiterungen (Fortgeschritten)
+    •    KI-Wunschpriorisierung basierend auf Nutzungsverhalten
+    •    Social Feature: Freundesliste, Vergleich, Challenges
+    •    Telegram-/WhatsApp-Reminder
+    •    iPhone Shortcuts Automation (z.B. täglicher Check)
+    
+--------------
+    TODOs (Priorisierte Reihenfolge)
+    1.    Datenmodell + DB aufsetzen
+    2.    Habits + Logs + Screenshot-Upload
+    3.    XP-System mit Tag-Kategorisierung
+    4.    Coins + Level + Streaks
+    5.    Wunschliste + Reward-Logik
+    6.    Strafenmechanik
+    7.    Tagesbuch & Medienintegration
+    8.    KI-Wunschpriorisierung (nach MVP)
