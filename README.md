@@ -37,7 +37,7 @@ API-Schlüssel: Ein gültiger API-Schlüssel für die Backend-Kommunikation.
 Installation
 1. iOS-App
 
-Repository klonen:git clone https://github.com/dein-benutzername/habit-tracker.git
+Repository klonen:git clone [[https://github.com/dein-benutzername/habit-tracker.git](https://github.com/dysticl/HabitTracker.git)](https://github.com/dysticl/HabitTracker.git)
 cd habit-tracker
 
 
@@ -61,11 +61,18 @@ Backend-Verzeichnis:Navigiere in das Backend-Verzeichnis (z. B. server).
 Abhängigkeiten installieren:npm install
 
 
-MySQL-Datenbank einrichten:
-Erstelle eine Datenbank namens habit_tracker_db:CREATE DATABASE habit_tracker_db;
+# Habit Tracker Setup Guide
 
+## MySQL-Datenbank einrichten
 
-Erstelle die habits-Tabelle:CREATE TABLE habits (
+### Erstelle eine Datenbank namens `habit_tracker_db`:
+```sql
+CREATE DATABASE habit_tracker_db;
+```
+
+### Erstelle die `habits`-Tabelle:
+```sql
+CREATE TABLE habits (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     emoji VARCHAR(10) DEFAULT '⭐️',
@@ -75,160 +82,142 @@ Erstelle die habits-Tabelle:CREATE TABLE habits (
     is_recurring BOOLEAN DEFAULT FALSE,
     deadline_duration INT DEFAULT NULL
 );
+```
 
+## Datenbankverbindung konfigurieren
 
-
-
-Datenbankverbindung konfigurieren:
-Öffne index.js.
-Passe die MySQL-Verbindung an:const pool = mysql.createPool({
+Öffne `index.js` und passe die MySQL-Verbindung an:
+```js
+const pool = mysql.createPool({
     host: 'localhost',
     user: 'dein-benutzername',
     password: 'dein-passwort',
     database: 'habit_tracker_db'
 });
+```
 
+### Ersetze den API-Schlüssel:
+```js
+const API_KEY = 'dein-api-schlüssel';
+```
 
-Ersetze den API-Schlüssel:const API_KEY = 'dein-api-schlüssel';
+## Uploads-Ordner erstellen
+```bash
+mkdir Uploads
+```
 
-
-
-
-Uploads-Ordner erstellen:mkdir Uploads
-
-
-Server starten:pm2 start index.js --name habit-tracker-api
+## Server starten
+```bash
+pm2 start index.js --name habit-tracker-api
 pm2 logs habit-tracker-api
+```
+Der Server läuft auf [http://localhost:3000](http://localhost:3000).
 
-Der Server läuft auf http://localhost:3000.
+---
 
-Nutzung
+## Nutzung
 
-App starten:
-Öffne die App auf deinem iOS-Gerät oder Simulator.
-Die App lädt automatisch vorhandene Habits vom Server.
+### App starten
+- Öffne die App auf deinem iOS-Gerät oder Simulator.
+- Die App lädt automatisch vorhandene Habits vom Server.
 
+### Habit erstellen
+- Klicke auf „Add Habit“.
+- Gib einen Namen (z. B. „100 Push-ups“) und optional eine Deadline in Stunden (z. B. „2“) ein.
+- Das Emoji wird automatisch auf „⭐️“ gesetzt.
+- Klicke auf das Häkchen, um das Habit zu erstellen.
 
-Habit erstellen:
-Klicke auf „Add Habit“.
-Gib einen Namen (z. B. „100 Push-ups“) und optional eine Deadline in Stunden (z. B. „2“) ein.
-Das Emoji wird automatisch auf „⭐️“ gesetzt.
-Klicke auf das Häkchen, um das Habit zu erstellen.
+### Countdown-Timer
+- Der Timer zeigt die Deadline des neuesten aktiven Habits an (z. B. „02:00:00“ für 2 Stunden).
+- Wenn die Zeit abläuft, wechselt der Timer zum nächsten aktiven Habit oder setzt auf 1 Stunde zurück.
 
+### Beweis hochladen
+- Tippe auf das Kreissymbol eines Habits.
+- Wähle ein Foto aus und lade es hoch.
+- Nicht-wiederkehrende Habits werden nach dem Upload gelöscht; wiederkehrende werden zurückgesetzt.
 
-Countdown-Timer:
-Der Timer zeigt die Deadline des neuesten aktiven Habits an (z. B. „02:00:00“ für 2 Stunden).
-Wenn die Zeit abläuft, wechselt der Timer zum nächsten aktiven Habit oder setzt auf 1 Stunde zurück.
+### Habits verwalten
+- Toggle „repeat“ für wiederkehrende Habits.
+- Sieh Fortschritt und XP-Punkte in der UI.
 
+---
 
-Beweis hochladen:
-Tippe auf das Kreissymbol eines Habits.
-Wähle ein Foto aus und lade es hoch.
-Nicht-wiederkehrende Habits werden nach dem Upload gelöscht; wiederkehrende werden zurückgesetzt.
+## API-Endpunkte
 
+Das Backend bietet folgende REST-Endpunkte (alle erfordern `X-API-Key` im Header):
 
-Habits verwalten:
-Toggle „repeat“ für wiederkehrende Habits.
-Sieh Fortschritt und XP-Punkte in der UI.
-
-
-
-API-Endpunkte
-Das Backend bietet folgende REST-Endpunkte (alle erfordern X-API-Key im Header):
-
-POST /habits
+### POST /habits
 Erstellt ein neues Habit.
-Body: { "name": "string", "emoji": "string", "xp_points": number, "is_completed": boolean, "progress": number, "is_recurring": boolean, "deadline_duration": number|null }
+```json
+Body: {
+  "name": "string",
+  "emoji": "string",
+  "xp_points": number,
+  "is_completed": boolean,
+  "progress": number,
+  "is_recurring": boolean,
+  "deadline_duration": number|null
+}
+```
 Antwort: 201 mit Habit-Objekt.
 
-
-GET /habits
-Listet alle Habits, sortiert nach ID (neueste zuerst).
+### GET /habits
+Listet alle Habits, sortiert nach ID (neueste zuerst).  
 Antwort: 200 mit Array von Habit-Objekten.
 
-
-POST /habits/:id/proof
+### POST /habits/:id/proof
 Lädt einen Beweis (Foto) hoch.
-Body: Multipart-Form mit proof (JPEG).
+```json
+Body: Multipart-Form mit `proof` (JPEG)
+```
 Antwort: 204 (nicht-wiederkehrend, gelöscht) oder 200 (wiederkehrend, aktualisiert).
 
-
-PUT /habits/:id
+### PUT /habits/:id
 Aktualisiert ein Habit.
-Body: Wie bei POST /habits.
+```json
+Body: wie bei POST /habits
+```
 Antwort: 200 mit aktualisiertem Habit.
 
-
-DELETE /habits/:id
-Löscht ein Habit.
+### DELETE /habits/:id
+Löscht ein Habit.  
 Antwort: 204 bei Erfolg.
 
+---
 
+## Datenbankstruktur
 
-Datenbankstruktur
-Die habits-Tabelle hat folgende Spalten:
+Die `habits`-Tabelle hat folgende Spalten:
 
+| Spalte            | Typ          | Beschreibung                         |
+|-------------------|--------------|--------------------------------------|
+| id                | INT          | Primärschlüssel, Auto-Increment      |
+| name              | VARCHAR(255) | Name des Habits                      |
+| emoji             | VARCHAR(10)  | Emoji (Standard: „⭐️“)               |
+| xp_points         | INT          | XP-Punkte (Standard: 10)             |
+| is_completed      | BOOLEAN      | Abgeschlossen (Standard: false)      |
+| progress          | DOUBLE       | Fortschritt (0.0–1.0)                |
+| is_recurring      | BOOLEAN      | Wiederkehrend (Standard: false)      |
+| deadline_duration | INT          | Deadline in Sekunden (optional)      |
 
+---
 
-Spalte
-Typ
-Beschreibung
+## Projektstruktur
 
-
-
-id
-INT
-Primärschlüssel, Auto-Increment
-
-
-name
-VARCHAR(255)
-Name des Habits
-
-
-emoji
-VARCHAR(10)
-Emoji (Standard: „⭐️“)
-
-
-xp_points
-INT
-XP-Punkte (Standard: 10)
-
-
-is_completed
-BOOLEAN
-Abgeschlossen (Standard: false)
-
-
-progress
-DOUBLE
-Fortschritt (0.0–1.0)
-
-
-is_recurring
-BOOLEAN
-Wiederkehrend (Standard: false)
-
-
-deadline_duration
-INT
-Deadline in Sekunden (optional)
-
-
-Projektstruktur
+```plaintext
 habit-tracker/
 ├── HabitTracker.xcodeproj/     # Xcode-Projekt
-├── HabitTracker/              # iOS-App
+├── HabitTracker/               # iOS-App
 │   ├── ContentView.swift       # Haupt-UI mit Timer und Habit-Liste
 │   ├── HabitViewModel.swift    # Logik für Habits und API-Aufrufe
 │   ├── APIManager.swift        # API-Kommunikation
-├── server/                    # Backend
-│   ├── index.js               # Node.js-Server
-│   ├── Uploads/               # Ordner für Beweisfotos
-│   ├── package.json           # Node.js-Abhängigkeiten
-├── README.md                  # Diese Datei
-
+├── server/                     # Backend
+│   ├── index.js                # Node.js-Server
+│   ├── Uploads/                # Ordner für Beweisfotos
+│   ├── package.json            # Node.js-Abhängigkeiten
+├── README.md                   # Diese Datei
+```
+"""
 Bekannte Probleme
 
 Der API-Schlüssel ist hartcodiert; für Produktion in Umgebungsvariablen auslagern.
