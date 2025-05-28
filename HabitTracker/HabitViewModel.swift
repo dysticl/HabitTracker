@@ -9,7 +9,7 @@ struct Habit: Identifiable, Codable, Equatable {
     var isCompleted: Bool
     var progress: Double
     var isRecurring: Bool
-    var deadlineDuration: Int? // Neue Eigenschaft für Deadline in Sekunden
+    var deadlineDuration: Int?
     var pendingDeletion: Bool
     
     static func ==(lhs: Habit, rhs: Habit) -> Bool {
@@ -33,8 +33,7 @@ class HabitViewModel: ObservableObject {
     @Published var habits: [Habit] = []
     @Published var isAdding: Bool = false
     @Published var newHabitName: String = ""
-    @Published var newHabitEmoji: String = ""
-    @Published var newHabitDeadlineHours: String = "" // Neue Eigenschaft für UI-Eingabe (Stunden)
+    @Published var newHabitDeadlineHours: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
@@ -52,7 +51,6 @@ class HabitViewModel: ObservableObject {
                         print("Fehler: Ungültige UUID \(apiHabit.id)")
                         return nil
                     }
-                    // Nur nicht-abgeschlossene oder wiederkehrende Habits anzeigen
                     guard !apiHabit.isCompleted || apiHabit.isRecurring else { return nil }
                     return Habit(
                         id: uuid,
@@ -87,12 +85,10 @@ class HabitViewModel: ObservableObject {
             let updatedHabit = try await APIManager.shared.uploadProof(habitId: habit.id.uuidString, photoData: photoData)
             await MainActor.run {
                 if !habit.isRecurring {
-                    // Nicht wiederkehrendes Habit wurde gelöscht, lokal entfernen
                     withAnimation(.easeInOut(duration: 0.5)) {
                         self.habits.removeAll { $0.id == habit.id }
                     }
                 } else if let updatedHabit = updatedHabit {
-                    // Wiederkehrendes Habit wurde aktualisiert, Status lokal aktualisieren
                     if let index = self.habits.firstIndex(where: { $0.id == habit.id }) {
                         guard let uuid = UUID(uuidString: updatedHabit.id) else {
                             self.errorMessage = "Ungültige UUID vom Server: \(updatedHabit.id)"
@@ -139,7 +135,6 @@ class HabitViewModel: ObservableObject {
             return
         }
         
-        // Lokalen Status vorübergehend aktualisieren
         await MainActor.run {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
                 self.habits[index].isCompleted.toggle()
@@ -182,7 +177,6 @@ class HabitViewModel: ObservableObject {
                 }
             }
             
-            // Nicht wiederkehrende, abgeschlossene Habits löschen
             if habits[index].isCompleted && !habits[index].isRecurring {
                 do {
                     try await APIManager.shared.deleteHabit(id: habit.id.uuidString)
@@ -193,7 +187,6 @@ class HabitViewModel: ObservableObject {
                             }
                         }
                     }
-                    // Verzögerte Entfernung für Animation
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         if let deleteIndex = self.habits.firstIndex(where: { $0.id == habit.id }) {
                             withAnimation(.easeInOut(duration: 0.5)) {
@@ -229,20 +222,16 @@ class HabitViewModel: ObservableObject {
             return
         }
         
-        let defaultEmojis = ["⭐️", "🔥", "💪", "📘", "☀️", "🧠", "📈", "🏆"]
-        let selectedEmoji = newHabitEmoji.isEmpty ? defaultEmojis.randomElement() ?? "⭐️" : newHabitEmoji
-        
-        // Deadline-Dauer aus Stunden in Sekunden umrechnen
         let deadlineDuration: Int?
         if let hours = Int(newHabitDeadlineHours), hours > 0 {
-            deadlineDuration = hours * 3600 // Stunden in Sekunden
+            deadlineDuration = hours * 3600
         } else {
             deadlineDuration = nil
         }
         
         let newHabit = APIHabitCreate(
             name: newHabitName,
-            emoji: selectedEmoji,
+            emoji: "⭐️",
             xpPoints: 10,
             isCompleted: false,
             progress: 0.0,
@@ -277,7 +266,7 @@ class HabitViewModel: ObservableObject {
                 
                 await MainActor.run {
                     withAnimation(.easeInOut(duration: 0.5)) {
-                        self.habits.append(Habit(
+                        self.habits.insert(Habit(
                             id: uuid,
                             name: apiHabit.name,
                             emoji: apiHabit.emoji,
@@ -287,9 +276,8 @@ class HabitViewModel: ObservableObject {
                             isRecurring: apiHabit.isRecurring,
                             deadlineDuration: apiHabit.deadlineDuration,
                             pendingDeletion: false
-                        ))
+                        ), at: 0)
                         self.newHabitName = ""
-                        self.newHabitEmoji = ""
                         self.newHabitDeadlineHours = ""
                         self.isAdding = false
                         self.isLoading = false

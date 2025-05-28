@@ -24,6 +24,13 @@ struct ContentView: View {
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
     
+    // Funktion um das neueste (oberste) Habit mit Deadline zu finden
+    private var activeHabitWithDeadline: Habit? {
+        return viewModel.habits.first { habit in
+            !habit.isCompleted && habit.deadlineDuration != nil
+        }
+    }
+    
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
@@ -91,16 +98,33 @@ struct ContentView: View {
                     .frame(height: 1)
                     .padding(.bottom, 8)
                 
-                Text(timeRemainingFormatted)
-                    .monospacedDigit()
-                    .foregroundColor(.white)
-                    .font(.system(size: 32, weight: .bold))
-                    .onReceive(timer) { _ in
-                        if timeRemaining > 0 {
-                            timeRemaining -= 1
-                        }
+                VStack(spacing: 4) {
+                    // Zeige den Namen des aktiven Habits mit Deadline
+                    if let activeHabit = activeHabitWithDeadline {
+                        Text(activeHabit.name)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                    } else {
+                        Text("Kein aktives Habit")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
                     }
-                    .padding(.bottom, 8)
+                    
+                    Text(timeRemainingFormatted)
+                        .monospacedDigit()
+                        .foregroundColor(timeRemaining <= 300 ? .red : .white)
+                        .font(.system(size: 32, weight: .bold))
+                        .onReceive(timer) { _ in
+                            if timeRemaining > 0 {
+                                timeRemaining -= 1
+                            }
+                            // Timer zurücksetzen, wenn er abläuft
+                            if timeRemaining <= 0 {
+                                updateTimerForActiveHabit()
+                            }
+                        }
+                }
+                .padding(.bottom, 8)
                 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -136,11 +160,6 @@ struct ContentView: View {
                             if viewModel.isAdding {
                                 VStack(spacing: 8) {
                                     TextField("Habit Name", text: $viewModel.newHabitName)
-                                        .textFieldStyle(PlainTextFieldStyle())
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal)
-                                    
-                                    TextField("Emoji (optional)", text: $viewModel.newHabitEmoji)
                                         .textFieldStyle(PlainTextFieldStyle())
                                         .foregroundColor(.white)
                                         .padding(.horizontal)
@@ -279,6 +298,9 @@ struct ContentView: View {
                     await viewModel.fetchHabits()
                 }
             }
+            .onChange(of: viewModel.habits) { _ in
+                updateTimerForActiveHabit()
+            }
             .alert(isPresented: Binding(
                 get: { viewModel.errorMessage != nil },
                 set: { if !$0 { viewModel.errorMessage = nil } }
@@ -289,6 +311,15 @@ struct ContentView: View {
                     dismissButton: .default(Text("OK"))
                 )
             }
+        }
+    }
+    
+    private func updateTimerForActiveHabit() {
+        if let activeHabit = activeHabitWithDeadline,
+           let deadline = activeHabit.deadlineDuration {
+            timeRemaining = max(deadline, 0) // Sicherstellen, dass Timer nicht negativ wird
+        } else {
+            timeRemaining = 3600 // Standard 1 Stunde
         }
     }
 }
@@ -309,12 +340,13 @@ struct HabitRow: View {
             
             Spacer()
             
-            // TODO: Später Timer für habit.deadlineDuration hinzufügen
-            // if let duration = habit.deadlineDuration {
-            //     Text(formatDuration(duration))
-            //         .foregroundColor(.gray)
-            //         .font(.system(size: 14))
-            // }
+            if let duration = habit.deadlineDuration {
+                let hours = duration / 3600
+                let minutes = (duration % 3600) / 60
+                Text(String(format: "%dh %02dm", hours, minutes))
+                    .foregroundColor(.gray)
+                    .font(.system(size: 12))
+            }
             
             Image(systemName: "repeat")
                 .foregroundColor(habit.isRecurring ? .blue : .gray)
