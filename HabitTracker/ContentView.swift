@@ -2,13 +2,6 @@ import SwiftUI
 import Charts
 import PhotosUI
 
-// Statische Habits für das rechte Diagramm
-let staticHabits: [Habit] = [
-    Habit(id: UUID(), name: "Gym", emoji: "💪", xpPoints: 15, isCompleted: false, progress: 0.6, isRecurring: false, deadlineDuration: nil, pendingDeletion: false),
-    Habit(id: UUID(), name: "Lernen", emoji: "🧠", xpPoints: 10, isCompleted: false, progress: 0.3, isRecurring: false, deadlineDuration: nil, pendingDeletion: false),
-    Habit(id: UUID(), name: "Ernährung", emoji: "🍏", xpPoints: 20, isCompleted: false, progress: 0.8, isRecurring: false, deadlineDuration: nil, pendingDeletion: false)
-]
-
 struct ContentView: View {
     @StateObject private var viewModel = HabitViewModel()
     @State private var timeRemaining: Int = 3600
@@ -29,6 +22,15 @@ struct ContentView: View {
         return viewModel.habits.first { habit in
             !habit.isCompleted && habit.deadlineDuration != nil
         }
+    }
+    
+    // Dynamische Kategorien für das Diagramm unten rechts
+    private var categories: [(name: String, emoji: String, progress: Double)] {
+        let grouped = Dictionary(grouping: viewModel.habits) { $0.category }
+        return grouped.map { category, habits in
+            let averageProgress = habits.map { $0.progress }.reduce(0, +) / Double(max(1, habits.count))
+            return (name: category, emoji: habits.first?.emoji ?? "⭐️", progress: averageProgress)
+        }.sorted { $0.name < $1.name }
     }
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -227,20 +229,22 @@ struct ContentView: View {
                             .font(.caption2)
                             .foregroundColor(.white.opacity(0.6))
                         
-                        Chart(0..<xpValues.count, id: \.self) { index in
-                            LineMark(
-                                x: .value("Tag", xpDays[index]),
-                                y: .value("XP", xpValues[index])
-                            )
-                            .foregroundStyle(Color.green)
-                            .lineStyle(StrokeStyle(lineWidth: 2.5))
-                            
-                            PointMark(
-                                x: .value("Tag", xpDays[index]),
-                                y: .value("XP", xpValues[index])
-                            )
-                            .foregroundStyle(Color.green)
-                            .symbolSize(30)
+                        Chart {
+                            ForEach(0..<xpValues.count, id: \.self) { index in
+                                LineMark(
+                                    x: .value("Tag", xpDays[index]),
+                                    y: .value("XP", xpValues[index])
+                                )
+                                .foregroundStyle(Color.green)
+                                .lineStyle(StrokeStyle(lineWidth: 2.5))
+                                
+                                PointMark(
+                                    x: .value("Tag", xpDays[index]),
+                                    y: .value("XP", xpValues[index])
+                                )
+                                .foregroundStyle(Color.green)
+                                .symbolSize(30)
+                            }
                         }
                         .chartYAxis(.hidden)
                         .chartXAxis {
@@ -256,9 +260,9 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     
                     VStack(spacing: 8) {
-                        ForEach(staticHabits) { habit in
+                        ForEach(categories, id: \.name) { category in
                             HStack {
-                                Text(habit.emoji)
+                                Text(category.emoji)
                                 GeometryReader { geometry in
                                     ZStack(alignment: .leading) {
                                         RoundedRectangle(cornerRadius: 4)
@@ -266,7 +270,7 @@ struct ContentView: View {
                                             .frame(height: 12)
                                         RoundedRectangle(cornerRadius: 4)
                                             .fill(Color.green)
-                                            .frame(width: geometry.size.width * max(0.0, min(1.0, habit.progress)), height: 12)
+                                            .frame(width: geometry.size.width * max(0.0, min(1.0, category.progress)), height: 12)
                                     }
                                 }
                                 .frame(height: 12)
@@ -458,4 +462,4 @@ struct ProofPopup: View {
 
 #Preview {
     ContentView()
-}
+}   

@@ -11,20 +11,20 @@ Ziel: Lauffähiger MVP mit Basis-Habit-Tracking, Screenshot-Upload, Backend-Komm
 🔹 Backend-Grundstruktur
 
 Ziel: Sauberes Node.js API-Backend mit MySQL, modular aufgebaut.
-    •    📁 index.js, Router + Controller Trennung (/routes, /controllers)
-    •    🧠 Service-Schicht (/services/habitService.js)
-    •    🗃️ MySQL-Struktur:
-    •    users, habits, habit_logs, screenshots
-    •    🔐 JWT-Authentifizierung für User
+•    📁 index.js, Router + Controller Trennung (/routes, /controllers)
+•    🧠 Service-Schicht (/services/habitService.js)
+•    🗃️ MySQL-Struktur:
+•    users, habits, habit_logs, screenshots
+•    🔐 JWT-Authentifizierung für User
 
 ⸻
 
 🔹 Frontend-Basis mit SwiftUI
 
 Ziel: Minimale UI für MVP-Interaktion
-    •    📱 ContentView: Übersicht + Habit-Check
-    •    🔗 APIConnection.swift → GET/POST für Habits, Screenshot-Upload
-    •    ✅ UI für Habit-Hinzufügen + Timer + Check-Button mit Upload-Funktion
+•    📱 ContentView: Übersicht + Habit-Check
+•    🔗 APIConnection.swift → GET/POST für Habits, Screenshot-Upload
+•    ✅ UI für Habit-Hinzufügen + Timer + Check-Button mit Upload-Funktion
 
 ⸻
 
@@ -33,16 +33,16 @@ Ziel: Minimale UI für MVP-Interaktion
 Ziel: Erste echte Funktionalität und Motivation durch Gamification
 
 🔹 Datenstruktur erweitern:
-    •    habits → Felder: xp, category, deadline, coin_reward, fail_penalty, streak, level_required
-    •    habit_logs: tägliche Check-History + Bild-Upload
-    •    user_progress: total_xp, coins, current_level, daily_streak
+•    habits → Felder: xp, category, deadline, coin_reward, fail_penalty, streak, level_required
+•    habit_logs: tägliche Check-History + Bild-Upload
+•    user_progress: total_xp, coins, current_level, daily_streak
 
 🔹 Core-Logik Backend
-    •    XP-Berechnung: Einfacher Algorithmus (Statisch)
-    •    Levelsystem: XP Thresholds + Level-Up
-    •    Streak-Tracking: bei täglichem Check mit Date
-    •    Coin-Rewards: bei Check automatisch hinzufügen
-    •    Fail-Funktion: Wenn Deadline verpasst = Strafe (XP/Coin Verlust)
+•    XP-Berechnung: Einfacher Algorithmus (Statisch)
+•    Levelsystem: XP Thresholds + Level-Up
+•    Streak-Tracking: bei täglichem Check mit Date
+•    Coin-Rewards: bei Check automatisch hinzufügen
+•    Fail-Funktion: Wenn Deadline verpasst = Strafe (XP/Coin Verlust)
 
 ⸻
 
@@ -51,16 +51,16 @@ Ziel: Erste echte Funktionalität und Motivation durch Gamification
 Ziel: Nutzerbindung durch Reflexion + Wünsche als Belohnung
 
 🔹 Tagebuch-System:
-    •    Tabelle: journal_entries mit user_id, text, image_url, habit_id
-    •    API-Endpoints: POST/GET Journaleintrag
+•    Tabelle: journal_entries mit user_id, text, image_url, habit_id
+•    API-Endpoints: POST/GET Journaleintrag
 
 🔹 Medien-/Wunschsystem:
-    •    Tabelle: wishes mit Feldern: title, type (anime, game, etc.), status (active, locked, done)
-    •    Wunsch freischalten wenn:
-    •    XP-Level erreicht
-    •    Coins vorhanden
-    •    Habit-Streak erfüllt
-    •    Frontend: UI mit Sperr-Icon für Wunschbelohnungen
+•    Tabelle: wishes mit Feldern: title, type (anime, game, etc.), status (active, locked, done)
+•    Wunsch freischalten wenn:
+•    XP-Level erreicht
+•    Coins vorhanden
+•    Habit-Streak erfüllt
+•    Frontend: UI mit Sperr-Icon für Wunschbelohnungen
 
 ⸻
 
@@ -69,10 +69,10 @@ Ziel: Nutzerbindung durch Reflexion + Wünsche als Belohnung
 Ziel: KI übernimmt XP-Kalkulation, Wunsch-Priorisierung & Vorschläge
 
 🔹 KI via API anbinden (OpenAI / custom):
-    •    /ai/analyzeHabit → nimmt Habit-Name + Deadline + Kategorie
-    •    Antwort: XP-Schätzung, Kategorie-Vorschlag
-    •    /ai/prioritizeWishes → sortiert Wunschliste nach Verhalten
-    •    /ai/dailyReport → analysiert Tagebuch + Fortschritt → Report als Text
+•    /ai/analyzeHabit → nimmt Habit-Name + Deadline + Kategorie
+•    Antwort: XP-Schätzung, Kategorie-Vorschlag
+•    /ai/prioritizeWishes → sortiert Wunschliste nach Verhalten
+•    /ai/dailyReport → analysiert Tagebuch + Fortschritt → Report als Text
 
 ⸻
 
@@ -81,16 +81,16 @@ Ziel: KI übernimmt XP-Kalkulation, Wunsch-Priorisierung & Vorschläge
 Ziel: Nutzer „erzieht“ sich selbst durch harte Regeln + Belohnung/Strafe
 
 🔹 Verstärkte Regeln:
-    •    Wünsche nur sichtbar wenn Regel erfüllt (Level, Coin, Streak)
-    •    Screenshot-Zwang sonst kein XP
-    •    Rückfall = Coinverlust + Wunschlöschung
-    •    Kein Check = Fortschritt gefreezt
+•    Wünsche nur sichtbar wenn Regel erfüllt (Level, Coin, Streak)
+•    Screenshot-Zwang sonst kein XP
+•    Rückfall = Coinverlust + Wunschlöschung
+•    Kein Check = Fortschritt gefreezt
 
 🔹 Visuelles Feedback:
-    •    XP-Balken
-    •    Streak-Flamme
-    •    Disziplinanzeige
-    •    Notifier: „Wenn du das nicht tust, verlierst du XYZ“
+•    XP-Balken
+•    Streak-Flamme
+•    Disziplinanzeige
+•    Notifier: „Wenn du das nicht tust, verlierst du XYZ“
 
 ⸻
 
@@ -99,9 +99,9 @@ Ziel: Nutzer „erzieht“ sich selbst durch harte Regeln + Belohnung/Strafe
 Ziel: Vergleich, Community, Push-Faktor
 
 🔹 Funktionen:
-    •    Freundesliste mit Code-Einladung
-    •    Leaderboard: XP, Level, Streaks
-    •    Challenge-Funktion: „Mach 3 Tage früh aufstehen gegen Minh Ky“
+•    Freundesliste mit Code-Einladung
+•    Leaderboard: XP, Level, Streaks
+•    Challenge-Funktion: „Mach 3 Tage früh aufstehen gegen Minh Ky“
 
 ⸻
 
@@ -110,10 +110,10 @@ Ziel: Vergleich, Community, Push-Faktor
 Ziel: Reminder, Automatisierung, Externe Tools
 
 🔹 Automatisierung:
-    •    Täglicher Push: „Jetzt Screenshot für XYZ-Habit“
-    •    iPhone Shortcut: Automatisch Screenshot auslösen + Upload
-    •    WhatsApp-Bot via Twilio (Reminder bei Failure)
-    •    Telegram Reminder (optional per Bot API)
+•    Täglicher Push: „Jetzt Screenshot für XYZ-Habit“
+•    iPhone Shortcut: Automatisch Screenshot auslösen + Upload
+•    WhatsApp-Bot via Twilio (Reminder bei Failure)
+•    Telegram Reminder (optional per Bot API)
 
 ⸻
 
@@ -122,12 +122,12 @@ Ziel: Reminder, Automatisierung, Externe Tools
 Ziel: Kontrolle über Nutzerdaten & manuelle Eingriffe
 
 🔹 Backend:
-    •    Admin-API: Nutzer blockieren, Coins ändern, Habits zurücksetzen
-    •    Statistik-Endpoint: User-Engagement, aktivste Habits etc.
+•    Admin-API: Nutzer blockieren, Coins ändern, Habits zurücksetzen
+•    Statistik-Endpoint: User-Engagement, aktivste Habits etc.
 
 ⸻
 
 🧬 MVP = Phase 1–2
-    •    Erste Version mit Habit + Screenshot + Level
-    •    Danach in 2-Wochen-Sprints ausbauen
+•    Erste Version mit Habit + Screenshot + Level
+•    Danach in 2-Wochen-Sprints ausbauen
 

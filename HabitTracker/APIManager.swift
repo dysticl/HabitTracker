@@ -9,6 +9,7 @@ struct APIHabit: Codable, Identifiable {
     let progress: Double
     let isRecurring: Bool
     let deadlineDuration: Int?
+    let category: String // Neue Eigenschaft
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -19,6 +20,7 @@ struct APIHabit: Codable, Identifiable {
         case progress
         case isRecurring
         case deadlineDuration = "deadline_duration"
+        case category
     }
 }
 
@@ -30,6 +32,7 @@ struct APIHabitCreate: Codable {
     let progress: Double
     let isRecurring: Bool
     let deadlineDuration: Int?
+    let category: String // Neue Eigenschaft
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -39,6 +42,7 @@ struct APIHabitCreate: Codable {
         case progress
         case isRecurring
         case deadlineDuration = "deadline_duration"
+        case category
     }
 }
 
@@ -68,7 +72,7 @@ enum APIError: Error, LocalizedError {
 class APIManager {
     static let shared = APIManager()
     private let baseURL = "https://api.davysgray.com"
-    private let apiKey = "your-secret-api-key-1234567890" // TODO: Mit echtem API-Schlüssel ersetzen
+    private let apiKey = "your-secret-api-key-1234567890" // TODO: Mit deinem API-Schlüssel ersetzen
     
     private init() {}
     
@@ -87,7 +91,6 @@ class APIManager {
             let jsonData = try encoder.encode(habit)
             request.httpBody = jsonData
             
-            // Debugging: JSON-Payload ausgeben
             if let jsonString = String(data: jsonData, encoding: .utf8) {
                 print("Create habit request body: \(jsonString)")
             }
@@ -98,11 +101,11 @@ class APIManager {
                 throw APIError.serverError("Ungültige Serverantwort")
             }
             
-            print("Create habit response status: \(httpResponse.statusCode)")
+            print("Create status: \(httpResponse.statusCode)")
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
             
             guard httpResponse.statusCode == 200 || httpResponse.statusCode == 201 else {
-                throw APIError.serverError("Erstellen des Habits fehlgeschlagen mit Statuscode: \(httpResponse.statusCode)")
+                throw APIError.serverError("Create failed with status code: \(httpResponse.statusCode)")
             }
             
             let decoder = JSONDecoder()
@@ -129,14 +132,14 @@ class APIManager {
                 throw APIError.serverError("Ungültige Serverantwort")
             }
             
-            print("Fetch habits response status: \(httpResponse.statusCode)")
+            print("Fetch habits status: \(httpResponse.statusCode)")
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
             
             guard httpResponse.statusCode == 200 else {
                 if httpResponse.statusCode == 401 {
                     throw APIError.unauthorized
                 }
-                throw APIError.serverError("Abrufen der Habits fehlgeschlagen mit Statuscode: \(httpResponse.statusCode)")
+                throw APIError.serverError("Fetch failed with status code: \(httpResponse.statusCode)")
             }
             
             let decoder = JSONDecoder()
@@ -179,12 +182,12 @@ class APIManager {
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
             
             if httpResponse.statusCode == 204 {
-                return nil // Nicht wiederkehrendes Habit wurde gelöscht
+                return nil
             } else if httpResponse.statusCode == 200 {
                 let decoder = JSONDecoder()
-                return try decoder.decode(APIHabit.self, from: data) // Wiederkehrendes Habit aktualisiert
+                return try decoder.decode(APIHabit.self, from: data)
             } else {
-                throw APIError.serverError("Hochladen des Beweises fehlgeschlagen mit Statuscode: \(httpResponse.statusCode)")
+                throw APIError.serverError("Upload proof failed with status code: \(httpResponse.statusCode)")
             }
         } catch {
             print("Upload proof error: \(error)")
@@ -216,7 +219,7 @@ class APIManager {
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
             
             guard httpResponse.statusCode == 200 else {
-                throw APIError.serverError("Aktualisieren des Habits fehlgeschlagen mit Statuscode: \(httpResponse.statusCode)")
+                throw APIError.serverError("Update habit failed with status code: \(httpResponse.statusCode)")
             }
             
             let decoder = JSONDecoder()
@@ -247,7 +250,7 @@ class APIManager {
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
             
             guard httpResponse.statusCode == 200 || httpResponse.statusCode == 204 else {
-                throw APIError.serverError("Löschen des Habits fehlgeschlagen mit Statuscode: \(httpResponse.statusCode)")
+                throw APIError.serverError("Delete habit failed with status code: \(httpResponse.statusCode)")
             }
         } catch {
             print("Delete habit error: \(error)")

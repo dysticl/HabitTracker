@@ -11,6 +11,7 @@ struct Habit: Identifiable, Codable, Equatable {
     var isRecurring: Bool
     var deadlineDuration: Int?
     var pendingDeletion: Bool
+    var category: String // Neue Eigenschaft
     
     static func ==(lhs: Habit, rhs: Habit) -> Bool {
         return lhs.id == rhs.id
@@ -26,6 +27,7 @@ struct Habit: Identifiable, Codable, Equatable {
         case isRecurring
         case deadlineDuration = "deadline_duration"
         case pendingDeletion
+        case category
     }
 }
 
@@ -61,7 +63,8 @@ class HabitViewModel: ObservableObject {
                         progress: apiHabit.progress,
                         isRecurring: apiHabit.isRecurring,
                         deadlineDuration: apiHabit.deadlineDuration,
-                        pendingDeletion: false
+                        pendingDeletion: false,
+                        category: apiHabit.category
                     )
                 }
                 self.isLoading = false
@@ -105,7 +108,8 @@ class HabitViewModel: ObservableObject {
                                 progress: updatedHabit.progress,
                                 isRecurring: updatedHabit.isRecurring,
                                 deadlineDuration: updatedHabit.deadlineDuration,
-                                pendingDeletion: false
+                                pendingDeletion: false,
+                                category: updatedHabit.category
                             )
                         }
                     }
@@ -150,7 +154,8 @@ class HabitViewModel: ObservableObject {
                 isCompleted: habits[index].isCompleted,
                 progress: habit.progress,
                 isRecurring: habit.isRecurring,
-                deadlineDuration: habit.deadlineDuration
+                deadlineDuration: habit.deadlineDuration,
+                category: habit.category
             )
             let updatedHabit = try await APIManager.shared.updateHabit(apiHabit)
             
@@ -171,7 +176,8 @@ class HabitViewModel: ObservableObject {
                             progress: updatedHabit.progress,
                             isRecurring: updatedHabit.isRecurring,
                             deadlineDuration: updatedHabit.deadlineDuration,
-                            pendingDeletion: false
+                            pendingDeletion: false,
+                            category: updatedHabit.category
                         )
                     }
                 }
@@ -236,7 +242,8 @@ class HabitViewModel: ObservableObject {
             isCompleted: false,
             progress: 0.0,
             isRecurring: false,
-            deadlineDuration: deadlineDuration
+            deadlineDuration: deadlineDuration,
+            category: "Allgemein" // Standard-Kategorie
         )
         
         Task {
@@ -275,7 +282,8 @@ class HabitViewModel: ObservableObject {
                             progress: apiHabit.progress,
                             isRecurring: apiHabit.isRecurring,
                             deadlineDuration: apiHabit.deadlineDuration,
-                            pendingDeletion: false
+                            pendingDeletion: false,
+                            category: apiHabit.category
                         ), at: 0)
                         self.newHabitName = ""
                         self.newHabitDeadlineHours = ""
