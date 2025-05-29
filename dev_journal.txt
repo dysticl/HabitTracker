@@ -1,0 +1,8 @@
+---
+Heute Morgen Nahcts am 30.05 habe ich noch folgendes zu tuen:
+1. Die UI zu fixen da das diagramm trotz der gefixten logik sich nicht anzeigen lässt
+2. Die Logik des Diagramms testen
+= 1,2 gefixt‚
+---
+
+

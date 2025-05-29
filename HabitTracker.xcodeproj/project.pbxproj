@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		650AB57A2DDE1A2600B14750 /* Notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 650AB5792DDE1A1700B14750 /* Notes.txt */; };
 		65959F252DE7DDE800CABD98 /* Roadmap.txt in Resources */ = {isa = PBXBuildFile; fileRef = 65959F242DE7DDDD00CABD98 /* Roadmap.txt */; };
+		65959F3D2DE919E400CABD98 /* dev_journal.txt in Resources */ = {isa = PBXBuildFile; fileRef = 65959F3C2DE919D900CABD98 /* dev_journal.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,7 @@
 		6525EE6F2DDB54C6003E2CAD /* HabitTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HabitTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6525EE792DDB54C6003E2CAD /* HabitTrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HabitTrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		65959F242DE7DDDD00CABD98 /* Roadmap.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Roadmap.txt; sourceTree = "<group>"; };
+		65959F3C2DE919D900CABD98 /* dev_journal.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = dev_journal.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -88,6 +90,7 @@
 				6525EE632DDB54C4003E2CAD /* Products */,
 				650AB5792DDE1A1700B14750 /* Notes.txt */,
 				65959F242DE7DDDD00CABD98 /* Roadmap.txt */,
+				65959F3C2DE919D900CABD98 /* dev_journal.txt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -222,6 +225,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				650AB57A2DDE1A2600B14750 /* Notes.txt in Resources */,
+				65959F3D2DE919E400CABD98 /* dev_journal.txt in Resources */,
 				65959F252DE7DDE800CABD98 /* Roadmap.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
