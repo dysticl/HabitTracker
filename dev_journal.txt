@@ -1,8 +1,25 @@
----
-Heute Morgen Nahcts am 30.05 habe ich noch folgendes zu tuen:
-1. Die UI zu fixen da das diagramm trotz der gefixten logik sich nicht anzeigen lässt
-2. Die Logik des Diagramms testen
-= 1,2 gefixt‚
----
+----------------------------------------
+Datum: 2025-05-30
+Startzeit: 16:00
+Fokus: Diagramm-UI & Logik testen
 
+ToDo:
+[ ] 1. Diagramm-UI fixen (wird nicht gerendert)
+[ ] 2. Diagramm-Logik unit-testen
+[ ] 3. Optional: Diagramm-Datenstruktur refactoren
 
+Done:
+[x] UI-Bug: Chart zeigte sich nicht -> fixed
+[x] Logik läuft durch -> Tests OK
+
+Erkenntnis:
+- Fehler war im Frontend, nicht in der Logik (Template falsch geladen)
+- Diagramm braucht Refresh bei setState()
+
+Blocker:
+- keine
+
+Stop-Zeit: 00:30
+Nächster Einstiegspunkt:
+
+----------------------------------------

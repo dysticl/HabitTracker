@@ -1,133 +1,76 @@
-//
-//  Roadmap.txt
-//  HabitTracker
-//
-//  Created by Daniel Kasanzew on 29.05.25.
-//
-Phase 1: Fundament (Infrastruktur + Kernfunktionen)
+Zweck der Applikation:
+Diese Applikation verfolgt den primären Zweck, den Benutzer bei der kontinuierlichen Selbstoptimierung zu unterstützen, mit dem Ziel, die individuell «beste Version seiner selbst» zu erreichen. Dies geschieht mittels systematischer Eliminierung von schädlichen Gewohnheiten, Aufbau neuer förderlicher Routinen sowie der gezielten Förderung bestehender Kompetenzen und der persönlichen Disziplin.
 
-Ziel: Lauffähiger MVP mit Basis-Habit-Tracking, Screenshot-Upload, Backend-Kommunikation.
+Methodisches Fundament:
+Die Anwendung stützt sich auf folgende methodische Elemente:
+• Habit-Tracking: Der Benutzer definiert konkrete, regelmässig zu wiederholende Verhaltensweisen (sog. Habits), welche fortlaufend überprüft und erfüllt werden.
+• Selbstreflexion & Analyse: Ein integriertes Tagebuch erlaubt die tägliche Reflexion, Verarbeitung und Analyse des persönlichen Fortschritts.
+• Gamification-Prinzipien: Nutzeraktivitäten werden spielerisch aufbereitet durch ein Belohnungssystem mit Leveln, Coins/xp und Streaks.
+• Soziale Dynamik: Die App erlaubt Fortschrittsvergleiche mit ausgewählten Benutzern (z. B. Freundeskreis) zur Erhöhung der Motivation durch sozialen Vergleich.
+• KI-basierter Fortschrittsalgorithmus: Eine AI analysiert Benutzerverhalten, Habit-Treue, Konsistenz sowie weitere Faktoren zur automatischen Vergabe von Erfahrungspunkten, Level und Priorisierung.
 
-🔹 Backend-Grundstruktur
+Psychologische & strategische Effekte
+• Dopaminbasierte Motivation: Fortschritte werden visuell und emotional belohnt (Level-Ups, akustisches Feedback)
+• Selbstdisziplin durch externe Kontrolle: Screenshot-Pflicht, sozialer Druck, aufgeschobene Belohnungen
+• Langfristige Nutzerbindung durch Daily-Streaks, XP-Mechanismen und Belohnungslogik
 
-Ziel: Sauberes Node.js API-Backend mit MySQL, modular aufgebaut.
-•    📁 index.js, Router + Controller Trennung (/routes, /controllers)
-•    🧠 Service-Schicht (/services/habitService.js)
-•    🗃️ MySQL-Struktur:
-•    users, habits, habit_logs, screenshots
-•    🔐 JWT-Authentifizierung für User
+Modularer Systemaufbau
+Die Applikation besteht aus folgenden Kernmodulen:
+    1.    Habit-System (Erstellung, Erfüllung, Wiederholung, XP-Zuteilung)
+    2.    Level-/XP-System (Gamifizierter Fortschritt, KI-gesteuert)
+    3.    Coin-/Belohnungssystem (Coins für Disziplin, Einlösung für Wünsche)
+    4.    Screenshot-Verifikation (Selbstkontrolle & Habit-Absicherung)
+    5.    Disziplin-Bewertung durch KI (Analyse der Ausführungsgüte)
+    6.    Tagebuch-Modul (Tägliche Eingaben mit Reflexions-Prompts)
+    7.    Soziale Vergleichskomponente (z. B. Leaderboard, Freundesvernetzung)
+    8.    Administratives Backend (Fehlerprotokollierung, DB-Kontrolle, Statistiken)
 
-⸻
-
-🔹 Frontend-Basis mit SwiftUI
-
-Ziel: Minimale UI für MVP-Interaktion
-•    📱 ContentView: Übersicht + Habit-Check
-•    🔗 APIConnection.swift → GET/POST für Habits, Screenshot-Upload
-•    ✅ UI für Habit-Hinzufügen + Timer + Check-Button mit Upload-Funktion
-
-⸻
-
-🔁 Phase 2: Core Habit Logic + Gamification Basis
-
-Ziel: Erste echte Funktionalität und Motivation durch Gamification
-
-🔹 Datenstruktur erweitern:
-•    habits → Felder: xp, category, deadline, coin_reward, fail_penalty, streak, level_required
-•    habit_logs: tägliche Check-History + Bild-Upload
-•    user_progress: total_xp, coins, current_level, daily_streak
-
-🔹 Core-Logik Backend
-•    XP-Berechnung: Einfacher Algorithmus (Statisch)
-•    Levelsystem: XP Thresholds + Level-Up
-•    Streak-Tracking: bei täglichem Check mit Date
-•    Coin-Rewards: bei Check automatisch hinzufügen
-•    Fail-Funktion: Wenn Deadline verpasst = Strafe (XP/Coin Verlust)
+Langfristige Vision
+Die App entwickelt sich parallel zum Benutzer weiter und soll langfristig:
+• autonome Steuerung und Empfehlungen via KI leisten
+• individuelle Coaching-Ziele unterstützen (z. B. „Mathe verbessern“, „Früh aufstehen“)
+• soziale Rechenschaftsmechanismen stärken (z. B. Live-Fortschrittsvergleiche)
+• Rückfallschutz bieten (durch Belohnungsverzicht, Bestrafung via Coinverlust etc.)
 
 ⸻
 
-📖 Phase 3: Tagebuch & Medienintegration
+Purpose of the Application
+The primary objective of the application is to facilitate the user’s ongoing self-optimization, with the ultimate goal of becoming the “best version of oneself.” This is achieved by systematically eliminating harmful habits, building new beneficial routines, and enhancing both existing skills and personal discipline.
 
-Ziel: Nutzerbindung durch Reflexion + Wünsche als Belohnung
+Methodological Basis
+The app is structured around the following methodological pillars:
+• Habit Tracking: The user defines specific, repeatable behavioral goals (habits) that are regularly reviewed and executed.
+• Self-Reflection & Analysis: An integrated journal enables daily reflection, cognitive processing, and personal progress analysis.
+• Gamification Principles: To enhance consistency and motivation, user activity is embedded in a reward-based progression system (leveling, coins, streaks).
+• Social Dynamics: The app supports progress comparisons with selected users (e.g., friends) to boost accountability and healthy competition.
+• AI-Based Progress Engine: A learning system processes input, consistency, habit adherence, and other metrics to allocate XP, assign levels, and prioritize goals.
 
-🔹 Tagebuch-System:
-•    Tabelle: journal_entries mit user_id, text, image_url, habit_id
-•    API-Endpoints: POST/GET Journaleintrag
+Target Audience
+The app is aimed at highly motivated individuals who pursue radical self-improvement, particularly:
+• Persons focused on discipline, productivity, and skill acquisition
+• Users with strong rational, efficient, and result-driven mindsets
+• Individuals needing clear, visual feedback on personal progress
+• Fans of anime- or game-based systems (e.g., Solo Leveling, Duolingo)
 
-🔹 Medien-/Wunschsystem:
-•    Tabelle: wishes mit Feldern: title, type (anime, game, etc.), status (active, locked, done)
-•    Wunsch freischalten wenn:
-•    XP-Level erreicht
-•    Coins vorhanden
-•    Habit-Streak erfüllt
-•    Frontend: UI mit Sperr-Icon für Wunschbelohnungen
+Psychological & Strategic Effects
+• Dopamine Optimization: Progress is emotionally reinforced via visual elements (level-ups, avatars, sound effects)
+• Self-Manipulation: Discipline is externally reinforced via screenshot obligations, delayed gratification, and social pressure
+• Long-Term Retention: XP, coins, and streak mechanics create a positive feedback loop that encourages daily commitment
 
-⸻
+Modular System Architecture
+The application is modular and includes the following components:
+    1.    Habit System (creation, tracking, repetition, XP allocation)
+    2.    Level/XP System (gamified, AI-managed progression)
+    3.    Coin/Reward System (rewards for discipline, exchangeable for wishes)
+    4.    Screenshot Requirement (for habit verification and control)
+    5.    Discipline Evaluation (AI-assessed quality of habit execution)
+    6.    Journal Module (daily prompts for structured reflection)
+    7.    Social Component (friend comparison, optional leaderboard)
+    8.    Admin Dashboard (for owner use: bug tracking, database, analytics)
 
-🧠 Phase 4: KI-Integration (MVP)
-
-Ziel: KI übernimmt XP-Kalkulation, Wunsch-Priorisierung & Vorschläge
-
-🔹 KI via API anbinden (OpenAI / custom):
-•    /ai/analyzeHabit → nimmt Habit-Name + Deadline + Kategorie
-•    Antwort: XP-Schätzung, Kategorie-Vorschlag
-•    /ai/prioritizeWishes → sortiert Wunschliste nach Verhalten
-•    /ai/dailyReport → analysiert Tagebuch + Fortschritt → Report als Text
-
-⸻
-
-🎮 Phase 5: Vollständige Gamification + Psychologisches Manipulationsdesign
-
-Ziel: Nutzer „erzieht“ sich selbst durch harte Regeln + Belohnung/Strafe
-
-🔹 Verstärkte Regeln:
-•    Wünsche nur sichtbar wenn Regel erfüllt (Level, Coin, Streak)
-•    Screenshot-Zwang sonst kein XP
-•    Rückfall = Coinverlust + Wunschlöschung
-•    Kein Check = Fortschritt gefreezt
-
-🔹 Visuelles Feedback:
-•    XP-Balken
-•    Streak-Flamme
-•    Disziplinanzeige
-•    Notifier: „Wenn du das nicht tust, verlierst du XYZ“
-
-⸻
-
-🧑‍🤝‍🧑 Phase 6: Social Features
-
-Ziel: Vergleich, Community, Push-Faktor
-
-🔹 Funktionen:
-•    Freundesliste mit Code-Einladung
-•    Leaderboard: XP, Level, Streaks
-•    Challenge-Funktion: „Mach 3 Tage früh aufstehen gegen Minh Ky“
-
-⸻
-
-🤖 Phase 7: Vollautomatisierung + iPhone Shortcuts + WhatsApp/Telegram
-
-Ziel: Reminder, Automatisierung, Externe Tools
-
-🔹 Automatisierung:
-•    Täglicher Push: „Jetzt Screenshot für XYZ-Habit“
-•    iPhone Shortcut: Automatisch Screenshot auslösen + Upload
-•    WhatsApp-Bot via Twilio (Reminder bei Failure)
-•    Telegram Reminder (optional per Bot API)
-
-⸻
-
-🔍 Zusatz: Admin Tools & Dashboard
-
-Ziel: Kontrolle über Nutzerdaten & manuelle Eingriffe
-
-🔹 Backend:
-•    Admin-API: Nutzer blockieren, Coins ändern, Habits zurücksetzen
-•    Statistik-Endpoint: User-Engagement, aktivste Habits etc.
-
-⸻
-
-🧬 MVP = Phase 1–2
-•    Erste Version mit Habit + Screenshot + Level
-•    Danach in 2-Wochen-Sprints ausbauen
-
+Long-Term Vision
+The application evolves with its users and will eventually:
+• Autonomously guide users through AI-driven habit management
+• Enable goal-specific coaching (e.g., “Improve Math”, “Wake up at 5 AM”)
+• Enhance accountability via real-time social comparison
+• Prevent relapse using punishments such as denied rewards or coin deductions

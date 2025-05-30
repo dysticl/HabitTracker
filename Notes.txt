@@ -90,7 +90,7 @@ Wenn ein Nutzer einen 25-Minuten-Fokus startet, wird nach dem Ablauf automatisch
     -- AI
 
 🎯 Wunschverwaltung (KI-gesteuert)
-    •    Wunschliste + “Verschoben”-Liste
+    •    Wunschliste + “Verschiben”-Liste
     •    KI priorisiert Wünsche nach Verhalten
     •    Zuteilung abhängig von Level, Coinstand, Verhalten
 
