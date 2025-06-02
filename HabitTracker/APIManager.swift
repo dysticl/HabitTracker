@@ -29,7 +29,7 @@ struct APIHabitCreate: Codable {
     let emoji: String?
     let xpPoints: Int
     let isCompleted: Bool
-    let progress<|control178|>Double
+    let progress: Double
     let isRecurring: Bool
     let deadlineDuration: Int?
     let category: String
@@ -84,7 +84,6 @@ class APIManager {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
     }
-
     
     func createHabit(_ habit: APIHabitCreate) async throws -> APIHabit {
         guard let url = URL(string: "\(baseURL)/habits") else {

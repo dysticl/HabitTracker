@@ -1,14 +1,8 @@
-//
-//  AuthManager.swift
-//  HabitTracker
-//
-//  Created by Daniel Kasanzew on 02.06.25.
-//
 import Foundation
 import AuthenticationServices
 import Security
 
-enum AuthError: Error, LocalizedError {
+enum AuthenticationError: Error, LocalizedError {
     case noCredentials
     case keychainError(String)
     case serverError(String)
@@ -34,7 +28,9 @@ class AuthManager: NSObject, ASAuthorizationControllerDelegate {
     private let baseURL = "https://api.davysgray.com"
     private let apiKey = "your-secret-api-key-1234567890"
     
-    private override init() {}
+    private override init() {
+        super.init()
+    }
     
     func signInWithApple(completion: @escaping (Result<String, Error>) -> Void) {
         self.completion = completion
@@ -49,7 +45,7 @@ class AuthManager: NSObject, ASAuthorizationControllerDelegate {
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-            self.completion?(.failure(AuthError.noCredentials))
+            self.completion?(.failure(AuthenticationError.noCredentials))
             return
         }
         
@@ -74,9 +70,9 @@ class AuthManager: NSObject, ASAuthorizationControllerDelegate {
         self.completion?(.failure(error))
     }
     
-    private func authenticateWithBackend(appleId: String, name: String, email: String) async throws -> String {
+    private func authenticateWithBackend(appleId: String, name: String, email: String?) async throws -> String {
         guard let url = URL(string: "\(baseURL)/auth/apple") else {
-            throw AuthError.serverError("Ungültige URL")
+            throw AuthenticationError.serverError("Ungültige URL")
         }
         
         var request = URLRequest(url: url)
@@ -87,23 +83,27 @@ class AuthManager: NSObject, ASAuthorizationControllerDelegate {
         let body: [String: Any] = [
             "appleId": appleId,
             "name": name.isEmpty ? nil : name,
-            "email": email.isEmpty ? nil : email
+            "email": email
         ].compactMapValues { $0 }
         
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw AuthError.serverError("Authentifizierung fehlgeschlagen mit Status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                throw AuthenticationError.serverError("Authentifizierung fehlgeschlagen mit Status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+            }
+            
+            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let token = json["token"] as? String else {
+                throw AuthenticationError.serverError("Ungültiges Token-Format")
+            }
+            
+            return token
+        } catch {
+            throw AuthenticationError.networkError(error)
         }
-        
-        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let token = json["token"] as? String else {
-            throw AuthError.serverError("Ungültiges Token-Format")
-        }
-        
-        return token
     }
     
     private func saveToken(_ token: String) throws {
@@ -117,7 +117,7 @@ class AuthManager: NSObject, ASAuthorizationControllerDelegate {
         
         let status = SecItemAdd(query as CFDictionary, nil)
         guard status == errSecSuccess else {
-            throw AuthError.keychainError("Fehler beim Speichern des Tokens: \(status)")
+            throw AuthenticationError.keychainError("Fehler beim Speichern des Tokens: \(status)")
         }
     }
     
@@ -140,30 +140,34 @@ class AuthManager: NSObject, ASAuthorizationControllerDelegate {
     
     func refreshToken() async throws -> String {
         guard let currentToken = getToken() else {
-            throw AuthError.noCredentials
+            throw AuthenticationError.noCredentials
         }
         
         guard let url = URL(string: "\(baseURL)/auth/refresh") else {
-            throw AuthError.serverError("Ungültige URL")
+            throw AuthenticationError.serverError("Ungültige URL")
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = "POST"
         request.setValue("Bearer \(currentToken)", forHTTPHeaderField: "Authorization")
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw AuthError.serverError("Token-Refresh fehlgeschlagen mit Status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                throw AuthenticationError.serverError("Token-Refresh fehlgeschlagen mit Status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+            }
+            
+            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let newToken = json["token"] as? String else {
+                throw AuthenticationError.serverError("Ungültiges Token-Format")
+            }
+            
+            try saveToken(newToken)
+            return newToken
+        } catch {
+            throw AuthenticationError.networkError(error)
         }
-        
-        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let newToken = json["token"] as? String else {
-            throw AuthError.serverError("Ungültiges Token-Format")
-        }
-        
-        try saveToken(newToken)
-        return newToken
     }
 }
