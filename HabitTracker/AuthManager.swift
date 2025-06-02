@@ -1,5 +1,4 @@
 import Foundation
-import AuthenticationServices
 import Security
 
 enum AuthenticationError: Error, LocalizedError {
@@ -11,7 +10,7 @@ enum AuthenticationError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .noCredentials:
-            return "Keine Anmeldeinformationen verfügbar"
+            return "Ungültige Anmeldeinformationen"
         case .keychainError(let message):
             return "Keychain-Fehler: \(message)"
         case .serverError(let message):
@@ -22,56 +21,30 @@ enum AuthenticationError: Error, LocalizedError {
     }
 }
 
-class AuthManager: NSObject, ASAuthorizationControllerDelegate {
+struct LoginResponse: Codable {
+    let token: String
+    let user: User
+    
+    struct User: Codable {
+        let id: String
+        let email: String
+        let name: String?
+    }
+}
+
+class AuthManager {
     static let shared = AuthManager()
-    private var completion: ((Result<String, Error>) -> Void)?
     private let baseURL = "https://api.davysgray.com"
     private let apiKey = "your-secret-api-key-1234567890"
     
-    private override init() {
-        super.init()
-    }
+    private init() {}
     
-    func signInWithApple(completion: @escaping (Result<String, Error>) -> Void) {
-        self.completion = completion
-        let appleIDProvider = ASAuthorizationAppleIDProvider()
-        let request = appleIDProvider.createRequest()
-        request.requestedScopes = [.fullName, .email]
-        
-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        authorizationController.delegate = self
-        authorizationController.performRequests()
-    }
-    
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-            self.completion?(.failure(AuthenticationError.noCredentials))
-            return
+    func signIn(email: String, password: String) async throws {
+        guard !email.isEmpty, !password.isEmpty else {
+            throw AuthenticationError.noCredentials
         }
         
-        let appleId = appleIDCredential.user
-        let name = [appleIDCredential.fullName?.givenName, appleIDCredential.fullName?.familyName]
-            .compactMap { $0 }
-            .joined(separator: " ")
-        let email = appleIDCredential.email
-        
-        Task {
-            do {
-                let token = try await authenticateWithBackend(appleId: appleId, name: name, email: email)
-                try saveToken(token)
-                self.completion?(.success(token))
-            } catch {
-                self.completion?(.failure(error))
-            }
-        }
-    }
-    
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        self.completion?(.failure(error))
-    }
-    
-    private func authenticateWithBackend(appleId: String, name: String, email: String?) async throws -> String {
-        guard let url = URL(string: "\(baseURL)/auth/apple") else {
+        guard let url = URL(string: "\(baseURL)/auth/login") else {
             throw AuthenticationError.serverError("Ungültige URL")
         }
         
@@ -80,29 +53,25 @@ class AuthManager: NSObject, ASAuthorizationControllerDelegate {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
         
-        let body: [String: Any] = [
-            "appleId": appleId,
-            "name": name.isEmpty ? nil : name,
-            "email": email
-        ].compactMapValues { $0 }
+        let body: [String: String] = [
+            "email": email,
+            "password": password
+        ]
         
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        request.httpBody = try JSONEncoder().encode(body)
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw AuthenticationError.serverError("Authentifizierung fehlgeschlagen mit Status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+                throw AuthenticationError.serverError("Anmeldung fehlgeschlagen: Status \((response as? HTTPURLResponse)?.statusCode ?? -1)")
             }
             
-            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let token = json["token"] as? String else {
-                throw AuthenticationError.serverError("Ungültiges Token-Format")
-            }
-            
-            return token
+            let loginResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
+            try saveToken(loginResponse.token)
         } catch {
-            throw AuthenticationError.networkError(error)
+            print("Login error: \(error)")
+            throw error is AuthenticationError ? error : AuthenticationError.networkError(error)
         }
     }
     
@@ -159,14 +128,15 @@ class AuthManager: NSObject, ASAuthorizationControllerDelegate {
                 throw AuthenticationError.serverError("Token-Refresh fehlgeschlagen mit Status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
             }
             
-            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let newToken = json["token"] as? String else {
+            let refreshResponse = try JSONDecoder().decode([String: String].self, from: data)
+            guard let newToken = refreshResponse["token"] else {
                 throw AuthenticationError.serverError("Ungültiges Token-Format")
             }
             
             try saveToken(newToken)
             return newToken
         } catch {
+            print("Refresh token error: \(error)")
             throw AuthenticationError.networkError(error)
         }
     }

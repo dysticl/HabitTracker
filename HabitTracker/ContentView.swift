@@ -1,7 +1,6 @@
 import SwiftUI
 import Charts
 import PhotosUI
-import AuthenticationServices
 
 struct ContentView: View {
     @StateObject private var viewModel = HabitViewModel()
@@ -9,9 +8,11 @@ struct ContentView: View {
     @State private var currentStreak: Int = 3
     @State private var xpValues: [Int] = [10, 20, 5, 30, 15, 25, 18]
     @State private var xpDays: [String] = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-    @State private var proofHabitId: UUID? = nil
+    @State private var proofHabitId: UUID?
     @State private var isLoggedIn = false
     @State private var loginError: String?
+    @State private var email: String = ""
+    @State private var password: String = ""
     
     private var timeRemainingFormatted: String {
         let hours = timeRemaining / 3600
@@ -38,7 +39,6 @@ struct ContentView: View {
     
     var body: some View {
         if isLoggedIn {
-            // Bestehende Hauptansicht
             ZStack {
                 BlurView(style: .systemUltraThinMaterialDark)
                     .ignoresSafeArea()
@@ -153,7 +153,7 @@ struct ContentView: View {
                                         .padding()
                                 } else {
                                     ForEach($viewModel.habits) { $habit in
-                                        HabitRow(habit: $habit, onProofRequest: {
+                                        HabitRow(habit: $habit, viewModel: viewModel, onProofRequest: {
                                             proofHabitId = habit.id
                                         })
                                         .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .slide.combined(with: .opacity)))
@@ -267,10 +267,10 @@ struct ContentView: View {
                                     GeometryReader { geometry in
                                         ZStack(alignment: .leading) {
                                             RoundedRectangle(cornerRadius: 4)
-                                                .fill(Color.white.opacity(0.1))
+                                                .fill(.white.opacity(0.1))
                                                 .frame(height: 12)
                                             RoundedRectangle(cornerRadius: 4)
-                                                .fill(Color.green)
+                                                .fill(.green)
                                                 .frame(width: geometry.size.width * max(0.0, min(1.0, category.progress)), height: 12)
                                         }
                                     }
@@ -297,12 +297,7 @@ struct ContentView: View {
                     }
                     .padding(.bottom, 16)
                 }
-                .ignoresSafeArea(edges: .bottom)
-                .onAppear {
-                    Task {
-                        await viewModel.fetchHabits()
-                    }
-                }
+                .ignoresSafeArea(.bottom)
                 .onChange(of: viewModel.habits) { _ in
                     updateTimerForActiveHabit()
                 }
@@ -318,44 +313,59 @@ struct ContentView: View {
                 }
             }
         } else {
-            // Login-Ansicht
-            VStack {
+            VStack(spacing: 20) {
                 Text("Willkommen bei Habit Tracker")
                     .font(.title)
                     .foregroundColor(.white)
                     .padding()
                 
-                Text("Bitte mit Apple anmelden")
+                Text("Bitte anmelden")
                     .font(.title2)
                     .foregroundColor(.white)
                     .padding()
                 
-                SignInWithAppleButton(
-                    .signIn,
-                    onRequest: { request in
-                        request.requestedScopes = [.fullName, .email]
-                    },
-                    onCompletion: { _ in }
-                )
-                .frame(height: 45)
-                .padding()
-                .onTapGesture {
-                    AuthManager.shared.signInWithApple { result in
-                        switch result {
-                        case .success:
+                TextField("E-Mail", text: $email)
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(.white.opacity(0.1))
+                    .cornerRadius(8)
+                    .autocapitalization(.none)
+                    .keyboardType(.emailAddress)
+                
+                SecureField("Passwort", text: $password)
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(.white.opacity(0.1))
+                    .cornerRadius(8)
+                
+                Button(action: {
+                    Task {
+                        do {
+                            try await AuthManager.shared.signIn(email: email, password: password)
                             DispatchQueue.main.async {
                                 isLoggedIn = true
                                 Task {
                                     await viewModel.fetchHabits()
                                 }
                             }
-                        case .failure(let error):
+                        } catch {
                             DispatchQueue.main.async {
                                 loginError = error.localizedDescription
                             }
                         }
                     }
+                }) {
+                    Text("Anmelden")
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(.blue)
+                        .cornerRadius(8)
                 }
+                .padding(.horizontal)
                 
                 if let loginError = loginError {
                     Text(loginError)
@@ -363,12 +373,12 @@ struct ContentView: View {
                         .padding()
                 }
             }
+            .padding()
             .background(
                 BlurView(style: .systemUltraThinMaterialDark)
                     .ignoresSafeArea()
             )
             .onAppear {
-                // Prüfe Token beim Start
                 if AuthManager.shared.getToken() != nil {
                     isLoggedIn = true
                     Task {
@@ -382,7 +392,7 @@ struct ContentView: View {
     private func updateTimerForActiveHabit() {
         if let activeHabit = activeHabitWithDeadline,
            let deadline = activeHabit.deadlineDuration {
-            timeRemaining = max(deadline, 0)
+            timeRemaining = max(0, deadline)
         } else {
             timeRemaining = 3600
         }
@@ -391,8 +401,8 @@ struct ContentView: View {
 
 struct HabitRow: View {
     @Binding var habit: Habit
+    @ObservedObject var viewModel: HabitViewModel
     let onProofRequest: () -> Void
-    @EnvironmentObject var viewModel: HabitViewModel // Zugriff auf ViewModel
     
     var body: some View {
         HStack {
@@ -436,7 +446,7 @@ struct HabitRow: View {
                         .transition(.scale.combined(with: .opacity))
                 } else {
                     Circle()
-                        .strokeBorder(Color.white.opacity(0.4), lineWidth: 2)
+                        .strokeBorder(.white.opacity(0.4), lineWidth: 2)
                         .frame(width: 28, height: 28)
                         .transition(.scale.combined(with: .opacity))
                 }
@@ -482,8 +492,8 @@ struct BlurView: UIViewRepresentable {
 struct ProofPopup: View {
     let habit: Habit
     let onUpload: (Data) async -> Void
-    @State private var selectedPhoto: PhotosPickerItem? = nil
-    @State private var photoData: Data? = nil
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var photoData: Data?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -494,7 +504,7 @@ struct ProofPopup: View {
             PhotosPicker(selection: $selectedPhoto, matching: .images) {
                 Text("Foto auswählen")
                     .padding()
-                    .background(Color.blue)
+                    .background(.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
@@ -506,18 +516,18 @@ struct ProofPopup: View {
                 }
             }
             
-            if photoData != nil {
-                Button("Absenden") {
-                    if let data = photoData {
-                        Task {
-                            await onUpload(data)
-                        }
+            if let data = photoData {
+                Button(action: {
+                    Task {
+                        await onUpload(data)
                     }
+                }) {
+                    Text("Absenden")
+                        .padding()
+                        .background(.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
-                .padding()
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(8)
             }
         }
         .padding()

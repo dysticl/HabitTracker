@@ -63,36 +63,7 @@ class HabitViewModel: ObservableObject {
                 self.isLoading = false
             }
         }
-    }
-    
-    func signInWithApple() async {
-        await MainActor.run {
-            self.isLoading = true
-            self.errorMessage = nil
-        }
         
-        do {
-            try await withCheckedThrowingContinuation { continuation in
-                AuthManager.shared.signInWithApple { result in
-                    switch result {
-                    case .success:
-                        continuation.resume()
-                    case .failure(let error):
-                        continuation.resume(throwing: error)
-                    }
-                }
-            }
-            await MainActor.run {
-                self.isLoggedIn = true
-            }
-            await fetchHabits()
-        } catch {
-            await MainActor.run {
-                self.errorMessage = "Login fehlgeschlagen: \(error.localizedDescription)"
-                self.isLoading = false
-            }
-            print("Sign in error: \(error)")
-        }
     }
     
     func updateHabitRecurring(_ habit: Habit, isRecurring: Bool) async {
@@ -127,7 +98,7 @@ class HabitViewModel: ObservableObject {
                 deadlineDuration: habit.deadlineDuration,
                 category: habit.category
             )
-            let updatedHabit = try await APIManager.shared.updateHabit(apiHabit)
+            let updatedHabit = try await APIManager.shared.updateWithHabit(apiHabit)
             
             await MainActor.run {
                 if let currentIndex = self.habits.firstIndex(where: { $0.id == habit.id }) {
@@ -294,7 +265,7 @@ class HabitViewModel: ObservableObject {
                             id: uuid,
                             name: updatedHabit.name,
                             emoji: updatedHabit.emoji,
-                            xpPoints: updatedHabit.xpPoints,
+                            xpPoints: updatedHabits.xpPoints,
                             isCompleted: updatedHabit.isCompleted,
                             progress: updatedHabit.progress,
                             isRecurring: updatedHabit.isRecurring,
