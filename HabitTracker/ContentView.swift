@@ -392,6 +392,7 @@ struct ContentView: View {
 struct HabitRow: View {
     @Binding var habit: Habit
     let onProofRequest: () -> Void
+    @EnvironmentObject var viewModel: HabitViewModel // Zugriff auf ViewModel
     
     var body: some View {
         HStack {
@@ -416,7 +417,9 @@ struct HabitRow: View {
             Image(systemName: "repeat")
                 .foregroundColor(habit.isRecurring ? .blue : .gray)
                 .onTapGesture {
-                    habit.isRecurring.toggle()
+                    Task {
+                        await viewModel.updateHabitRecurring(habit, isRecurring: !habit.isRecurring)
+                    }
                 }
             
             Text("+\(habit.xpPoints)")
