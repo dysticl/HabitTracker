@@ -75,6 +75,43 @@ class AuthManager {
         }
     }
     
+    func signUp(email: String, password: String, name: String?) async throws {
+        guard !email.isEmpty, !password.isEmpty else {
+            throw AuthenticationError.noCredentials
+        }
+        
+        guard let url = URL(string: "\(baseURL)/auth/signup") else {
+            throw AuthenticationError.serverError("Ungültige URL")
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        
+        let body: [String: String?] = [
+            "email": email,
+            "password": password,
+            "name": name
+        ]
+        
+        request.httpBody = try JSONEncoder().encode(body)
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 else {
+                throw AuthenticationError.serverError("Registrierung fehlgeschlagen: Status \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+            }
+            
+            let loginResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
+            try saveToken(loginResponse.token)
+        } catch {
+            print("Signup error: \(error)")
+            throw error is AuthenticationError ? error : AuthenticationError.networkError(error)
+        }
+    }
+    
     private func saveToken(_ token: String) throws {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -105,6 +142,14 @@ class AuthManager {
             return nil
         }
         return token
+    }
+    
+    func clearToken() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: "authToken"
+        ]
+        SecItemDelete(query as CFDictionary)
     }
     
     func refreshToken() async throws -> String {
