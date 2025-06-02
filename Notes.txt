@@ -40,6 +40,9 @@ Reihenfolge ist wichtig – keine Diskussion. Folge dem wie ein Roboter.
 
 Du willst Gamification, Disziplin und Manipulation – perfekt, wir drehen daraus ein System.
 
+----
+3. Idee um die fähigkeiit ideen zu generieren. (Im internet Ideen Generierung suchen und implemetieren als Daily todo)
+
 ⸻
 
 🔧 Feature-Name: „Disziplinierter Pomodoro-Flow“

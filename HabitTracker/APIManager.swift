@@ -9,7 +9,7 @@ struct APIHabit: Codable, Identifiable {
     let progress: Double
     let isRecurring: Bool
     let deadlineDuration: Int?
-    let category: String // Neue Eigenschaft
+    let category: String
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -26,13 +26,13 @@ struct APIHabit: Codable, Identifiable {
 
 struct APIHabitCreate: Codable {
     let name: String
-    let emoji: String
+    let emoji: String?
     let xpPoints: Int
     let isCompleted: Bool
-    let progress: Double
+    let progress<|control178|>Double
     let isRecurring: Bool
     let deadlineDuration: Int?
-    let category: String // Neue Eigenschaft
+    let category: String
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -72,9 +72,19 @@ enum APIError: Error, LocalizedError {
 class APIManager {
     static let shared = APIManager()
     private let baseURL = "https://api.davysgray.com"
-    private let apiKey = "your-secret-api-key-1234567890" // TODO: Mit deinem API-Schlüssel ersetzen
+    private let apiKey = "your-secret-api-key-1234567890"
     
     private init() {}
+    
+    private func configureRequest(_ request: inout URLRequest) async throws {
+        guard let token = AuthManager.shared.getToken() else {
+            throw APIError.unauthorized
+        }
+        
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+    }
+
     
     func createHabit(_ habit: APIHabitCreate) async throws -> APIHabit {
         guard let url = URL(string: "\(baseURL)/habits") else {
@@ -84,7 +94,8 @@ class APIManager {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        
+        try await configureRequest(&request)
         
         do {
             let encoder = JSONEncoder()
@@ -103,6 +114,15 @@ class APIManager {
             
             print("Create status: \(httpResponse.statusCode)")
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
+            
+            if httpResponse.statusCode == 401 {
+                do {
+                    _ = try await AuthManager.shared.refreshToken()
+                    return try await createHabit(habit) // Retry
+                } catch {
+                    throw APIError.unauthorized
+                }
+            }
             
             guard httpResponse.statusCode == 200 || httpResponse.statusCode == 201 else {
                 throw APIError.serverError("Create failed with status code: \(httpResponse.statusCode)")
@@ -123,7 +143,8 @@ class APIManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        
+        try await configureRequest(&request)
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -135,10 +156,16 @@ class APIManager {
             print("Fetch habits status: \(httpResponse.statusCode)")
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
             
-            guard httpResponse.statusCode == 200 else {
-                if httpResponse.statusCode == 401 {
+            if httpResponse.statusCode == 401 {
+                do {
+                    _ = try await AuthManager.shared.refreshToken()
+                    return try await fetchHabits() // Retry
+                } catch {
                     throw APIError.unauthorized
                 }
+            }
+            
+            guard httpResponse.statusCode == 200 else {
                 throw APIError.serverError("Fetch failed with status code: \(httpResponse.statusCode)")
             }
             
@@ -157,7 +184,8 @@ class APIManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        
+        try await configureRequest(&request)
         
         let boundary = UUID().uuidString
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
@@ -181,6 +209,15 @@ class APIManager {
             print("Upload proof response status: \(httpResponse.statusCode)")
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
             
+            if httpResponse.statusCode == 401 {
+                do {
+                    _ = try await AuthManager.shared.refreshToken()
+                    return try await uploadProof(habitId: habitId, photoData: photoData) // Retry
+                } catch {
+                    throw APIError.unauthorized
+                }
+            }
+            
             if httpResponse.statusCode == 204 {
                 return nil
             } else if httpResponse.statusCode == 200 {
@@ -203,7 +240,8 @@ class APIManager {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        
+        try await configureRequest(&request)
         
         do {
             let encoder = JSONEncoder()
@@ -217,6 +255,15 @@ class APIManager {
             
             print("Update habit response status: \(httpResponse.statusCode)")
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
+            
+            if httpResponse.statusCode == 401 {
+                do {
+                    _ = try await AuthManager.shared.refreshToken()
+                    return try await updateHabit(habit) // Retry
+                } catch {
+                    throw APIError.unauthorized
+                }
+            }
             
             guard httpResponse.statusCode == 200 else {
                 throw APIError.serverError("Update habit failed with status code: \(httpResponse.statusCode)")
@@ -237,7 +284,8 @@ class APIManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
-        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        
+        try await configureRequest(&request)
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -248,6 +296,15 @@ class APIManager {
             
             print("Delete habit response status: \(httpResponse.statusCode)")
             print("Response body: \(String(data: data, encoding: .utf8) ?? "Kein Body")")
+            
+            if httpResponse.statusCode == 401 {
+                do {
+                    _ = try await AuthManager.shared.refreshToken()
+                    return try await deleteHabit(id: id) // Retry
+                } catch {
+                    throw APIError.unauthorized
+                }
+            }
             
             guard httpResponse.statusCode == 200 || httpResponse.statusCode == 204 else {
                 throw APIError.serverError("Delete habit failed with status code: \(httpResponse.statusCode)")
