@@ -38,6 +38,62 @@ class HabitViewModel: ObservableObject {
     @Published var newHabitDeadlineHours: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var isLoggedIn: Bool = false
+    
+    init() {
+        Task {
+            await checkAuthStatus()
+        }
+    }
+    
+    func checkAuthStatus() async {
+        await MainActor.run {
+            self.isLoading = true
+            self.errorMessage = nil
+        }
+        
+        if AuthManager.shared.getToken() != nil {
+            await MainActor.run {
+                self.isLoggedIn = true
+            }
+            await fetchHabits()
+        } else {
+            await MainActor.run {
+                self.isLoggedIn = false
+                self.isLoading = false
+            }
+        }
+    }
+    
+    func signInWithApple() async {
+        await MainActor.run {
+            self.isLoading = true
+            self.errorMessage = nil
+        }
+        
+        do {
+            try await withCheckedThrowingContinuation { continuation in
+                AuthManager.shared.signInWithApple { result in
+                    switch result {
+                    case .success:
+                        continuation.resume()
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }
+            }
+            await MainActor.run {
+                self.isLoggedIn = true
+            }
+            await fetchHabits()
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Login fehlgeschlagen: \(error.localizedDescription)"
+                self.isLoading = false
+            }
+            print("Sign in error: \(error)")
+        }
+    }
     
     func fetchHabits() async {
         await MainActor.run {
@@ -219,73 +275,6 @@ class HabitViewModel: ObservableObject {
                 self.isLoading = false
             }
             print("Toggle habit error: \(error)")
-        }
-    }
-    
-    func updateHabitRecurring(_ habit: Habit, isRecurring: Bool) async {
-        await MainActor.run {
-            self.isLoading = true
-            self.errorMessage = nil
-        }
-        
-        guard let index = habits.firstIndex(where: { $0.id == habit.id }) else {
-            await MainActor.run {
-                self.errorMessage = "Habit nicht gefunden"
-                self.isLoading = false
-            }
-            return
-        }
-        
-        await MainActor.run {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-                self.habits[index].isRecurring = isRecurring
-            }
-        }
-        
-        do {
-            let apiHabit = APIHabit(
-                id: habit.id.uuidString,
-                name: habit.name,
-                emoji: habit.emoji,
-                xpPoints: habit.xpPoints,
-                isCompleted: habit.isCompleted,
-                progress: habit.progress,
-                isRecurring: isRecurring,
-                deadlineDuration: habit.deadlineDuration,
-                category: habit.category
-            )
-            let updatedHabit = try await APIManager.shared.updateHabit(apiHabit)
-            
-            await MainActor.run {
-                if let currentIndex = self.habits.firstIndex(where: { $0.id == habit.id }) {
-                    guard let uuid = UUID(uuidString: updatedHabit.id) else {
-                        self.errorMessage = "Ungültige UUID vom Server: \(updatedHabit.id)"
-                        self.isLoading = false
-                        return
-                    }
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        self.habits[currentIndex] = Habit(
-                            id: uuid,
-                            name: updatedHabit.name,
-                            emoji: updatedHabit.emoji,
-                            xpPoints: updatedHabit.xpPoints,
-                            isCompleted: updatedHabit.isCompleted,
-                            progress: updatedHabit.progress,
-                            isRecurring: updatedHabit.isRecurring,
-                            deadlineDuration: updatedHabit.deadlineDuration,
-                            pendingDeletion: false,
-                            category: updatedHabit.category
-                        )
-                    }
-                }
-                self.isLoading = false
-            }
-        } catch {
-            await MainActor.run {
-                self.errorMessage = "Fehler beim Aktualisieren des Habits: \(error.localizedDescription)"
-                self.isLoading = false
-            }
-            print("Update recurring error: \(error)")
         }
     }
     

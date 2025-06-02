@@ -10,8 +10,6 @@ struct ContentView: View {
     @State private var xpValues: [Int] = [10, 20, 5, 30, 15, 25, 18]
     @State private var xpDays: [String] = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
     @State private var proofHabitId: UUID? = nil
-    @State private var isLoggedIn = false
-    @State private var loginError: String?
     
     private var timeRemainingFormatted: String {
         let hours = timeRemaining / 3600
@@ -37,8 +35,7 @@ struct ContentView: View {
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        if isLoggedIn {
-            // Bestehende Hauptansicht
+        if viewModel.isLoggedIn {
             ZStack {
                 BlurView(style: .systemUltraThinMaterialDark)
                     .ignoresSafeArea()
@@ -224,39 +221,37 @@ struct ContentView: View {
                         }
                     }
                     
-                    HStack(alignment: .top, spacing: 16) {
+                    HStack(alignment: .top, spacing: 24) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("XP")
-                                .font(.caption2)
-                                .foregroundColor(.white.opacity(0.6))
+                                .font(.system(size: 14))
+                                .foregroundStyle(.white.opacity(0.7))
                             
                             Chart {
-                                ForEach(0..<xpValues.count, id: \.self) { index in
+                                ForEach(0..<xpValues.count), id: \.self) { index in
                                     LineMark(
                                         x: .value("Tag", xpDays[index]),
                                         y: .value("XP", xpValues[index])
-                                    )
-                                    .foregroundStyle(Color.green)
-                                    .lineStyle(StrokeStyle(lineWidth: 2.5))
+                                    .foregroundStyle(.green)
+                                    .lineStyle(.init(lineWidth: 2.5)))
                                     
                                     PointMark(
                                         x: .value("Tag", xpDays[index]),
-                                        y: .value("XP", xpValues[index])
-                                    )
-                                    .foregroundStyle(Color.green)
-                                    .symbolSize(30)
+                                        y: .value("XP", xpValues[index]))
+                                    .foregroundStyle(.green)
+                                    .symbolSize(.init(30)))
                                 }
                             }
                             .chartYAxis(.hidden)
                             .chartXAxis {
                                 AxisMarks(preset: .aligned, position: .bottom) { _ in
                                     AxisValueLabel()
-                                        .foregroundStyle(Color.white.opacity(0.6))
-                                        .font(.caption2)
+                                        .foregroundStyle(.white.opacity(0.7))
+                                        .font(.system(size: 10))
                                 }
                             }
                             .frame(height: 60)
-                            .cornerRadius(8)
+                            .cornerRadius(20)
                         }
                         .frame(maxWidth: .infinity)
                         
@@ -267,67 +262,62 @@ struct ContentView: View {
                                     GeometryReader { geometry in
                                         ZStack(alignment: .leading) {
                                             RoundedRectangle(cornerRadius: 4)
-                                                .fill(Color.white.opacity(0.1))
-                                                .frame(height: 12)
+                                                .fill(.white.opacity(0))
+                                                .frame(height: 40)
                                             RoundedRectangle(cornerRadius: 4)
-                                                .fill(Color.green)
-                                                .frame(width: geometry.size.width * max(0.0, min(1.0, category.progress)), height: 12)
+                                                .fill(.green)
+                                                .frame(width: geometry.size.width * max(0.0, min(1.1, max(category.progress))), height: 20)
                                         }
                                     }
-                                    .frame(height: 12)
+                                    .frame(height: 16)
                                 }
                             }
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color.black.opacity(0.5))
+                    .padding()
+                    .background(.black.opacity(0.5)))
+                    .frame(maxWidth: .infinity)
                     
                     Rectangle()
                         .fill(Color.white.opacity(0.2))
                         .frame(height: 1)
-                        .padding(.bottom, 8)
+                        .frame(maxWidth: .infinity)
+                        
+ .padding(.bottom, 8)
                     
                     HStack {
-                        TabBarItem(icon: "flame", label: "Habits")
-                        TabBarItem(icon: "flag", label: "Ziele")
-                        TabBarItem(icon: "person.3", label: "Freunde")
-                        TabBarItem(icon: "gear", label: "Einstellungen")
-                    }
+                        TabBarItem(name: "flame", label: "Favorites")
+                        TabBarItem(name: "flag", label: "Tasks")
+                        TabBarItem(name: "person.3", label: "Friends")
+                        TabBarItem(name: "gear", label: "Settings")
+                            }
                     .padding(.bottom, 16)
-                }
-                .ignoresSafeArea(edges: .bottom)
-                .onAppear {
-                    Task {
-                        await viewModel.fetchHabits()
+                    }
+                    .ignoresSafeArea()
+                    .onAppear {
+                        Task {
+                            await viewModel.fetchHabits()
+                        }
+                    }
+                    .onChange(of: viewModel.habits) { _ in
+                        updateTimerForActiveHabit()
+                    }
+                    .alert(isPresented: .constant(Binding(
+                        get: { viewModel.errorMessage != nil },
+                        set: { if !$0 { viewModel.errorMessage = nil } }
+                    ))) {
+                        Alert(
+                            title: Text("Error"),
+                            message: Text(viewModel.errorMessage ?? "Some error"),
+                            dismissButton: .default(Text("OK"))
+                        )
                     }
                 }
-                .onChange(of: viewModel.habits) { _ in
-                    updateTimerForActiveHabit()
-                }
-                .alert(isPresented: Binding(
-                    get: { viewModel.errorMessage != nil },
-                    set: { if !$0 { viewModel.errorMessage = nil } }
-                )) {
-                    Alert(
-                        title: Text("Fehler"),
-                        message: Text(viewModel.errorMessage ?? "Unbekannter Fehler"),
-                        dismissButton: .default(Text("OK"))
-                    )
-                }
-            }
         } else {
-            // Login-Ansicht
             VStack {
-                Text("Willkommen bei Habit Tracker")
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .padding()
-                
                 Text("Bitte mit Apple anmelden")
                     .font(.title2)
-                    .foregroundColor(.white)
                     .padding()
                 
                 SignInWithAppleButton(
@@ -335,45 +325,19 @@ struct ContentView: View {
                     onRequest: { request in
                         request.requestedScopes = [.fullName, .email]
                     },
-                    onCompletion: { _ in }
-                )
-                .frame(height: 45)
-                .padding()
-                .onTapGesture {
-                    AuthManager.shared.signInWithApple { result in
-                        switch result {
-                        case .success:
-                            DispatchQueue.main.async {
-                                isLoggedIn = true
-                                Task {
-                                    await viewModel.fetchHabits()
-                                }
-                            }
-                        case .failure(let error):
-                            DispatchQueue.main.async {
-                                loginError = error.localizedDescription
-                            }
+                    onCompletion: { result in
+                        Task {
+                            await viewModel.signInWithApple()
                         }
                     }
-                }
+                )
+                .frame(height: 45)
+                .padding(.horizontal)
                 
-                if let loginError = loginError {
-                    Text(loginError)
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
                         .foregroundColor(.red)
                         .padding()
-                }
-            }
-            .background(
-                BlurView(style: .systemUltraThinMaterialDark)
-                    .ignoresSafeArea()
-            )
-            .onAppear {
-                // Prüfe Token beim Start
-                if AuthManager.shared.getToken() != nil {
-                    isLoggedIn = true
-                    Task {
-                        await viewModel.fetchHabits()
-                    }
                 }
             }
         }
@@ -381,8 +345,8 @@ struct ContentView: View {
     
     private func updateTimerForActiveHabit() {
         if let activeHabit = activeHabitWithDeadline,
-           let deadline = activeHabit.deadlineDuration {
-            timeRemaining = max(deadline, 0)
+           let deadlineDuration = activeHabit.deadlineDuration {
+            timeRemaining = max(0, deadlineDuration)
         } else {
             timeRemaining = 3600
         }
@@ -392,138 +356,136 @@ struct ContentView: View {
 struct HabitRow: View {
     @Binding var habit: Habit
     let onProofRequest: () -> Void
-    @EnvironmentObject var viewModel: HabitViewModel // Zugriff auf ViewModel
     
     var body: some View {
         HStack {
             Text(habit.emoji)
                 .font(.system(size: 24))
                 .padding(.trailing, 4)
-            
-            Text(habit.name)
+                
+                Text(habit.name)
                 .foregroundColor(.white)
                 .fontWeight(.medium)
-            
-            Spacer()
-            
-            if let duration = habit.deadlineDuration {
-                let hours = duration / 3600
-                let minutes = (duration % 3600) / 60
-                Text(String(format: "%dh %02dm", hours, minutes))
+                
+                Spacer()
+                
+                .frame(width:spacing)
+                if let duration = habit.deadlineDuration {
+                    Text(String(format: "%dh %dmh", duration / 3600, (duration % 3600) / 60))
                     .foregroundColor(.gray)
                     .font(.system(size: 12))
-            }
-            
-            Image(systemName: "repeat")
-                .foregroundColor(habit.isRecurring ? .blue : .gray)
-                .onTapGesture {
-                    Task {
-                        await viewModel.updateHabitRecurring(habit, isRecurring: !habit.isRecurring)
+                }
+                
+                Image(systemName: "repeat")
+                    .foregroundColor(habit.isRecurring ? .blue : .gray)
+                    .onTapGesture {
+                        habit.isRecurring.toggle()
                     }
-                }
-            
-            Text("+\(habit.xpPoints)")
-                .foregroundColor(.green)
-                .fontWeight(.semibold)
-                .opacity(habit.isCompleted ? 1 : 0.4)
-                .animation(.easeInOut(duration: 0.2), value: habit.isCompleted)
-            
-            ZStack {
-                if habit.isCompleted {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundColor(.green)
-                        .transition(.scale.combined(with: .opacity))
-                } else {
-                    Circle()
-                        .strokeBorder(Color.white.opacity(0.4), lineWidth: 2)
-                        .frame(width: 28, height: 28)
-                        .transition(.scale.combined(with: .opacity))
-                }
-            }
-            .onTapGesture {
-                if !habit.isCompleted {
-                    onProofRequest()
-                }
-            }
-        }
-        .padding()
-        .background(.white.opacity(0.1))
-        .cornerRadius(12)
-    }
-}
-
-struct TabBarItem: View {
-    let icon: String
-    let label: String
-    
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .foregroundColor(.white)
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(.white.opacity(0.7))
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct BlurView: UIViewRepresentable {
-    var style: UIBlurEffect.Style
-    
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        return UIVisualEffectView(effect: UIBlurEffect(style: style))
-    }
-    
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
-}
-
-struct ProofPopup: View {
-    let habit: Habit
-    let onUpload: (Data) async -> Void
-    @State private var selectedPhoto: PhotosPickerItem? = nil
-    @State private var photoData: Data? = nil
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("Beweise, dass du '\(habit.name)' erledigt hast")
-                .font(.headline)
-                .multilineTextAlignment(.center)
-            
-            PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                Text("Foto auswählen")
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }
-            .onChange(of: selectedPhoto) { newItem in
-                Task {
-                    if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                        photoData = data
+                
+                Text("+\(value:habit.xpPoints)")
+                    .foregroundColor(.green)
+                    .fontWeight(.semibold)
+                    .opacity(habit.isCompleted ? 1 : 0.4)
+                    .animation(.easeInOut(duration: 0.2), value: habit.isCompleted)
+                
+                ZStack {
+                    if habit.isCompleted {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(.green)
+                            .transition(.scale)
+                    } else {
+                        Circle()
+                            .strokeBorder(.white.opacity(0.4), lineWidth: 2)
+                            .frame(width: 28, height: 28)
+                            .transition(.scale)
+                        }
                     }
-                }
-            }
-            
-            if photoData != nil {
-                Button("Absenden") {
-                    if let data = photoData {
-                        Task {
-                            await onUpload(data)
+                    .onTapGesture {
+                        if !habit.isCompleted {
+                            onProofRequest()
                         }
                     }
                 }
                 .padding()
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+                .background(.white.opacity(0.1))
+                .cornerRadius(12)
             }
         }
-        .padding()
-    }
-}
-
-#Preview {
-    ContentView()
-}
+        
+        struct TabBarItem: View {
+            let name: String
+            let label: String
+            
+            var body: some View {
+                VStack(spacing: 4) {
+                    Image(systemName: name)
+                        .foregroundColor(.white)
+                    Text(label)
+                        .font(.system(size: 10))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        
+        struct BlurView: UIViewRepresentable {
+            var style: UIBlurEffectStyle
+            
+            func makeUIView(context _: Context) -> UIVisualEffectView {
+                return UIVisualEffectView(effect: .init(UIBlurEffect(style: style)))
+            }
+            
+            func updateUIView(_ uiView: UIVisualEffectView, context _: Context) {}
+        }
+        
+        struct ProofPopup: View {
+            let habit: Habit
+            let onUpload: (Data) async -> Void
+            @State private var selectedPhoto: PhotosPickerItem? = nil
+            @State private var photoData: Data? = nil
+            
+            var body: some View {
+                VStack(spacing: 20) {
+                    Text("Prove that you've completed '\(value:habit.name)'")
+                        .font(.headline)
+                        .multilineTextAlignment(.center)
+                    
+                    PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                        Text("Select Photo")
+                            .padding()
+                            .background(.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                        .onChange(of: selectedPhoto) { _, newItem in
+                            Task {
+                                if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                                    photoData = data
+                                }
+                            }
+                        }
+                    
+                    if photoData != nil {
+                        Button(action: {
+                            if let data = photoData {
+                                Task {
+                                    await onUpload(data)
+                                }
+                            }
+                        }) {
+                            Text("Submit")
+                                .padding()
+                                .background(.green)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+                    }
+                }
+                .padding()
+            }
+        }
+        
+        #Preview {
+            ContentView()
+        }
